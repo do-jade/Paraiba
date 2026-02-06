@@ -1,0 +1,13 @@
+[project]
+name = "paraiba"
+version = "0.1.1"
+description = "hidden-gem travel recommendation system"
+requires-python = ">=3.12,<3.13"
+
+dependencies = [
+    "spacey==3.7.4",
+    "vaderSentiment==3.3.2",
+    "rapidfuzz==3.9.6"
+    "pytest"
+    "numpy<2.0"
+]
