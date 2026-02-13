@@ -1,0 +1,37 @@
+[
+  {
+    "name": "Satchel's Pizza",
+    "address": "1800 NE 23rd Ave, Gainesville, FL 32609, United States",
+    "rating": 4.7,
+    "category": "restaurant",
+    "place_id": "ChIJ0eY99h2k6IgRILAjo-PIX0U"
+  },
+  {
+    "name": "Satchel's Pizza",
+    "address": "1800 NE 23rd Ave, Gainesville, FL 32609, United States",
+    "rating": 4.7,
+    "category": "restaurant",
+    "place_id": "ChIJ0eY99h2k6IgRILAjo-PIX0U"
+  },
+  {
+    "name": "Paynes Prairie Preserve State Park",
+    "address": "100 Savannah Blvd, Micanopy, FL 32667, United States",
+    "rating": 4.7,
+    "category": "attraction",
+    "place_id": "ChIJOcvRfCaf6IgRBNn_MkPaShI"
+  },
+  {
+    "name": "Genius Entertainment",
+    "address": "2632 NW 43rd St #2130, Gainesville, FL 32606, United States",
+    "rating": 4.8,
+    "category": "other",
+    "place_id": "ChIJ3Rs_v6W96IgRnKB0RMyZf3Y"
+  },
+  {
+    "name": "DJ's Cast Iron Burgers",
+    "address": "5310 NW 8th Ave, Gainesville, FL 32605, United States",
+    "rating": 4.8,
+    "category": "restaurant",
+    "place_id": "ChIJ2dm0cBil6IgRudic6XTCS9s"
+  }
+]
