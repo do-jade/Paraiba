@@ -43,6 +43,18 @@ export async function createCommentsUsingRedditScrapper(req, res) {
         {
           url: "https://www.reddit.com/r/GNV/comments/bi861b/hidden_food_gems/",
         },
+        {
+          url: "https://www.reddit.com/r/GNV/comments/ajenmt/anyone_know_any_outdoor_hidden_gems/",
+        },
+        {
+          url: "https://www.reddit.com/r/GNV/comments/171j93p/fun_hidden_gems_in_gnv_that_are_cheapfree/",
+        },
+        {
+          url: "https://www.reddit.com/r/GNV/comments/26zn3r/what_are_some_holeinthewallhidden_restaurant_gems/",
+        },
+        {
+          url: "https://www.reddit.com/r/GNV/comments/7ozzn3/what_are_some_undiscovered_hidden_gem_restaurants/",
+        },
       ],
       time: "all",
     };
@@ -62,7 +74,7 @@ export async function createCommentsUsingRedditScrapper(req, res) {
       console.dir(item);
     });
 
-    // ✅ ADD: store ONLY the comments in MongoDB
+    // ADD: store ONLY the comments in MongoDB
     const commentDocs = [];
     for (const item of items) {
       const comments = Array.isArray(item?.comments) ? item.comments : [];
@@ -80,7 +92,7 @@ export async function createCommentsUsingRedditScrapper(req, res) {
       await Comment.insertMany(commentDocs, { ordered: false });
     }
 
-    console.log(`✅ Inserted ${commentDocs.length} comments into DB`);
+    console.log(`Inserted ${commentDocs.length} comments into DB`);
 
     return res.status(200).json({
       message: "Scrape complete",
