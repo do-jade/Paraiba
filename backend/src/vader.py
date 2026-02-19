@@ -1,6 +1,55 @@
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
-analyzer = SentimentIntensityAnalyzer()
+class SentimentAnalyzer:
+    def __init__(self):
+        self.vader = SentimentIntensityAnalyzer()
+
+        # Added patterns geared towards attractions and restaurants. 
+        self.positiveKeywords = [
+            "hidden gem", "must try", "must-try", "go-to", "go to",
+            "freshest", "fresh", "legit", "underrated", "secret", "worth",
+            "winner", "been around forever", "local favorite",
+            "authentic", "rec", "would recommend", "my pick", "top pick"
+        ]
+
+        self.negativeKeywords = [
+            "fine", "okay", "only option",
+            "nothing special", "overrated", "overhyped",
+            "meh", "average", "mediocre", "not worth"
+        ]
+
+    def analyze(self, text):
+        scores = self.vader.polarity_scores(text)
+        compound = scores["compound"]
+        textLower = text.lower()
+
+        for keyword in self.positiveKeywords:
+            if keyword in textLower:
+                compound += 0.15
+
+        for keyword in self.negativeKeywords:
+            if keyword in textLower:
+                compound -= 0.2
+
+        compound = max(-1.0, min(1.0, compound))
+
+        if compound >= 0.05:
+            label = "Positive."
+
+        elif compound <= -0.05:
+            label = "Negative."
+
+        else:
+            label = "Neutral."
+
+        return {
+            "compound": round(compound, 3),
+            "classification": label,
+            "vaderCompound": round(scores["compound"], 3)
+        }
+
+
+analyzer = SentimentAnalyzer()
 
 # Same comments that Adam used for spaCy testing. 
 sampleComments = [
@@ -21,25 +70,11 @@ sampleComments = [
 ]
 
 for i, comment in enumerate(sampleComments, 1):
-    # Retrieves sentiment scores.
-    scores = analyzer.polarity_scores(comment)
+    result = analyzer.analyze(comment)
     
     print(f"Comment #{i}:")
     print(f"  Text: {comment}")
-    print(f"  Negative: {scores['neg']:.3f}")
-    print(f"  Neutral:  {scores['neu']:.3f}")
-    print(f"  Positive: {scores['pos']:.3f}")
-    print(f"  Compound: {scores['compound']:.3f}")
-    
-    # Classifies sentiment. 
-    if scores['compound'] >= 0.05:
-        sentiment_label = "Positive."
-
-    elif scores['compound'] <= -0.05:
-        sentiment_label = "Negative."
-
-    else:
-        sentiment_label = "Neutral."
-    
-    print(f"Classification: {sentiment_label}")
+    print(f"  VADER Compound:    {result['vaderCompound']:.3f}")
+    print(f"  Enhanced Compound: {result['compound']:.3f}")
+    print(f"  Classification: {result['classification']}")
     print()
