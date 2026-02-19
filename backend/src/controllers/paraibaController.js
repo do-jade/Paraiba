@@ -12,7 +12,8 @@ export async function createParaibaEntry(req, res) {
       sentimentRating,
       ranking,
       upvotes,
-      rawText,
+      comments,
+      googleReviews,
       link,
     } = req.body;
 
@@ -26,7 +27,8 @@ export async function createParaibaEntry(req, res) {
       sentimentRating,
       ranking,
       upvotes,
-      rawText,
+      comments,
+      googleReviews,
       link,
     });
     const savedEntry = await entry.save();

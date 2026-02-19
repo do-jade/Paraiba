@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-// 1- create a schema 
+// 1- create a schema
 // 2- model based off of that schema
 
 const paraibaSchema = new mongoose.Schema(
@@ -17,10 +17,10 @@ const paraibaSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
-    x: {
+    reviewCount: {
       type: Number,
       required: false,
-      min: 0
+      min: 0,
     },
     rating: {
       type: Number,
@@ -28,33 +28,39 @@ const paraibaSchema = new mongoose.Schema(
     },
     description: {
       type: String,
-      required: false
+      required: false,
     },
     sentimentRating: {
       type: Number,
-      required: false
+      required: false,
     },
     ranking: {
       type: Number,
-      required: false
+      required: false,
     },
     upvotes: {
       type: Number,
       required: false,
-      min: 0
+      min: 0,
     },
-    rawText: {
-      type: String,
-      required: false
+    comments: {
+      type: [String],
+      required: false,
+      default: [],
+    },
+    googleReviews: {
+      type: [String],
+      required: false,
+      default: [],
     },
     link: {
       type: String,
-      required: false
-    }
+      required: false,
+    },
   },
-  { timestamps: true } //createdAt, updatedAt 
+  { timestamps: true }, //createdAt, updatedAt
 );
 
-const Paraiba = mongoose.model("Paraiba", paraibaSchema)
+const Paraiba = mongoose.model("Paraiba", paraibaSchema);
 
-export default Paraiba
+export default Paraiba;
