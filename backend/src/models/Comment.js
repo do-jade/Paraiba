@@ -17,6 +17,11 @@ const commentSchema = new mongoose.Schema(
             type: String,
             required: true
         },
+        processed: {
+            type: Boolean,
+            default: false,
+            required: true
+        },
     },
     { timestamps: true} // createdAt, updatedAt 
 );

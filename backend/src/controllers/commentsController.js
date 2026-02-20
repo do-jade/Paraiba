@@ -1,6 +1,12 @@
 import Comment from "../models/Comment.js";
 import { ApifyClient } from "apify-client";
 
+// helper to protect against deleted comments
+function isDeletedComment(c) {
+  const body = (c?.body ?? "").trim().toLowerCase();
+  return body === "[deleted]" || body === "[removed]" || body === "";
+}
+
 export async function createCommentsUsingRedditScrapper(req, res) {
   try {
     const APIFY_TOKEN = process.env.APIFY_TOKEN;
@@ -79,6 +85,7 @@ export async function createCommentsUsingRedditScrapper(req, res) {
     for (const item of items) {
       const comments = Array.isArray(item?.comments) ? item.comments : [];
       for (const c of comments) {
+        if (isDeletedComment(c)) continue; // calls helper to protect against deleted comments
         commentDocs.push({
           comment_text: c?.body ?? "",
           upvotes: c?.upVotes ?? 0,

@@ -1,9 +1,9 @@
-import express from "express";
-import notesRoutes from "./routes/notesRoutes.js";
-import commentRoutes from "./routes/commentsRoutes.js";
-import paraibaRoutes from "./routes/paraibaRoutes.js";
-import { connectDB } from "./config/db.js";
 import dotenv from "dotenv";
+import express from "express";
+import { connectDB } from "./config/db.js";
+import notesRoutes from "./routes/notesRoutes.js";
+import paraibaRoutes from "./routes/paraibaRoutes.js";
+import commentRoutes from "./routes/commentsRoutes.js";
 
 dotenv.config();
 

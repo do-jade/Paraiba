@@ -12,6 +12,8 @@ export async function createParaibaEntry(req, res) {
       sentimentRating,
       ranking,
       upvotes,
+      mentionCount,
+      location,
       comments,
       googleReviews,
       link,
