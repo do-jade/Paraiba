@@ -49,8 +49,29 @@ class SentimentAnalyzer:
         }
 
 
-analyzer = SentimentAnalyzer()
-
+def analyzer(texts): #input a comment to run entire vader program
+    sentiment = SentimentAnalyzer() #call the class
+    if isinstance(texts, str):
+        return sentiment.analyze(texts) #only runs if one string
+    if isinstance(texts, list) and len(texts) > 0: #if a list of strings
+        scores = []
+        for text in texts:
+            result = sentiment.analyze(text)
+            scores.append(result['compound']) #add the compound together
+            avg_compound = sum(scores) / len(scores) #divide by the number of strings
+            if avg_compound >= 0.05: #same logic as above but with compounded average
+                label = "Positive"
+            elif avg_compound <= -0.05:
+                label = "Negative"
+            else:
+                label = "Neutral"
+        return {
+            "compound": round(avg_compound, 3),
+            "classification": label,
+            "vaderCompound": round(avg_compound, 3)  
+        }
+    return None
+'''
 # Same comments that Adam used for spaCy testing. 
 sampleComments = [
     "Sushi Matsuri has some of the freshest sushi in town and has been around forever. That's my go-to spot.",
@@ -78,3 +99,4 @@ for i, comment in enumerate(sampleComments, 1):
     print(f"  Enhanced Compound: {result['compound']:.3f}")
     print(f"  Classification: {result['classification']}")
     print()
+'''

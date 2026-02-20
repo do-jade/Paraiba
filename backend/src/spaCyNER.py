@@ -13,17 +13,22 @@ class spaCyEntities:
         #basically want to ensure that all locations and restuarants are labeled as places to be picked up later
 
         patterns = [ #custom patterns created specifically to pick up restuarants and attractions
+            {"label": "PLACE", "pattern": [ #This pattern matches for the test, honestly it can probably be removed
+                {"IS_TITLE": True},
+                {"TEXT": "'s"},  
+                {"IS_TITLE": True, "OP": "+"}
+            ]},
             # This is to pick up names with 2 capitalized letters and a description about it EX: Hana Sushi grill picks up the first two as well as grill in list
             #This will not pick up Sushi Grill as Grill is a suffix, may have to fix later
             {"label": "PLACE", "pattern": [ #label is set to PLACE for pick up later
                 {"IS_TITLE": True}, #picks the first captitalized word
                 {"IS_TITLE": True, "OP": "+"}, #OP + is get at least 2 captitalized words
-                {"LOWER": {"IN": ["grill","bbq","kitchen","market","deli","cafe","café"]}} #need to make this longer to accept more
+                {"LOWER": {"IN": ["grill","bbq","kitchen","market","deli","cafe","café", "store"]}} #need to make this longer to accept more
             ]},
 
             # This pattern is to pick up verbs people would place infront of a place
             {"label": "PLACE", "pattern": [
-                {"LOWER": {"IN": ["try","visit","visited","loved","love","ate","dined", "be", "liked", "and", "or"]}}, #trigger the match like "loved Satchel's", however wont pick up ate yesterday 
+                {"LOWER": {"IN": ["try","visit","visited","loved","love","ate","dined", "be", "liked", "and", "or",]}}, #trigger the match like "loved Satchel's", however wont pick up ate yesterday 
                 {"IS_TITLE": True, "OP": "+"} #grabs the title
             ]},
 
@@ -87,7 +92,7 @@ class spaCyEntities:
 
         words = text.split()
         rmFront = {"at", "has", "is", "was", "are", "were", "liked", "be", "the", "a", "an", "thai", "pho", "jamaican", "chinese", 
-                   "burger", "bread",  "mexican", "southern", "sandwiches", "gyro", "indian", "and", "or", ","}
+                   "burger", "bread",  "mexican", "southern", "sandwiches", "gyro", "indian", "and", "or", ",", "but"}
         #above is a list of words to remove, will have to add more as time goes on
         while words and words[0].lower().strip(":") in rmFront: #get rid of leading words not part of the entity name
             words.pop(0)
@@ -100,7 +105,7 @@ class spaCyEntities:
         text = " ".join(words).strip() #gets all words back together 
         if len(text) < 2: #remove empty entities
             return ""
-        extraWords = {"the", "a", "an", "and", "or", "but", "my", "our", "this", "that", "has", "is", "was", "are", "were", "been"} #going to need more of these
+        extraWords = {"the", "a", "an", "and", "or", "but", "my", "our", "this", "that", "has", "is", "was", "are", "were", "been", "it's"} #going to need more of these
         if text.lower() in extraWords: #get rid of filler/ extra words that might throw google off
             return ""
         extraUpperWords = {"That's"} #extra edge case to catch uppercase words, will need to add more
@@ -109,10 +114,21 @@ class spaCyEntities:
         return text #return the entity back
 
     def _extract_locations(self, text: str): #extract the locations from text and return a list of all locations processed
-        doc = self.nlp(text)
+        #below are to clean the text because spacy cannot get them correct for whatever reason
+        text = text.replace('\u2019', "'")
+        text = text.replace('\u2018', "'")
+        text = text.replace('\u201c', '"')
+        text = text.replace('\u201d', '"')
+
+        doc = self.nlp(text) #load in the text
 
         locations = [] #store all cleaned locations from each input
         noDups = set() #set to store unique locations, may not need this
+
+        for ent in doc.ents:
+            if (ent.label_ == "PLACE"):
+                cleaned = self._clean_entity(ent.text)
+
         for ent in doc.ents: #for all entites
             if (ent.label_ == "PLACE"): #get only places as it was the one picked in the custom patterns
                 cleaned = self._clean_entity(ent.text)

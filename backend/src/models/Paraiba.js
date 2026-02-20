@@ -43,6 +43,15 @@ const paraibaSchema = new mongoose.Schema(
       required: false,
       min: 0,
     },
+    mentionCount: {
+      type: Number,
+      required: false,
+      min: 0,
+    },
+    location: {
+      type: String,
+      required: false,
+    },
     comments: {
       type: [String],
       required: false,
@@ -54,8 +63,9 @@ const paraibaSchema = new mongoose.Schema(
       default: [],
     },
     link: {
-      type: String,
+      type: [String],
       required: false,
+      default: [],
     },
   },
   { timestamps: true }, //createdAt, updatedAt
