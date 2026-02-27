@@ -111,6 +111,48 @@ const css = `
     text-transform: uppercase; color: #9ca3af; margin-top: 4px;
     display: block;
   }
+    /* ── CATEGORY ── */
+  .cat-header { text-align: center; margin-bottom: 40px; width: 100%; }
+  .cat-eyebrow {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.2em;
+    text-transform: uppercase; color: #2ec4b6; margin-bottom: 10px;
+  }
+  .cat-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px; font-weight: 900; color: #1a1a2e;
+  }
+  .cat-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 12px; width: 100%;
+  }
+  .cat-card {
+    background: #fff; border-radius: 14px;
+    padding: 32px 16px 26px;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 14px;
+    cursor: pointer; border: 1.5px solid #ece9e1;
+    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    position: relative; overflow: hidden;
+  }
+  .cat-card::before {
+    content: ''; position: absolute;
+    inset: 0; background: linear-gradient(135deg, rgba(46,196,182,0.06), transparent);
+    opacity: 0; transition: opacity 0.2s;
+  }
+  .cat-card:hover { transform: translateY(-5px); border-color: #2ec4b6; box-shadow: 0 16px 36px rgba(46,196,182,0.14); }
+  .cat-card:hover::before { opacity: 1; }
+  .cat-icon-wrap {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: #f7f6f2; display: flex;
+    align-items: center; justify-content: center;
+    font-size: 26px; border: 1.5px solid #ece9e1;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .cat-card:hover .cat-icon-wrap { border-color: #2ec4b6; background: rgba(46,196,182,0.06); }
+  .cat-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: #1a1a2e;
+  }
 `
 
 const PLACES = {
@@ -205,16 +247,51 @@ function HomePage({ onExplore }) {
   )
 }
 
+function CategoryPage({ onSelect, onBack }) {
+  const cats = [
+    { key: "restaurants", label: "Restaurants" },
+    { key: "cafes", label: "Cafes" },
+    { key: "parks", label: "Parks" },
+  ]
+  return (
+    <>
+      <BackBtn onClick={onBack} />
+      <div className="cat-header fu">
+        <p className="cat-eyebrow">Step 1 of 1</p>
+        <h2 className="cat-title">What are you exploring?</h2>
+      </div>
+      <div className="cat-grid">
+        {cats.map((c, i) => (
+          <div key={c.key} className={`cat-card fu${i + 1}`} onClick={() => onSelect(c.key, c.label)}>
+            <div className="cat-icon-wrap">{ICONS[c.key]}</div>
+            <span className="cat-label">{c.label}</span>
+          </div>
+        ))}
+      </div>
+    </>
+  )
+}
+
 export default function App() {
   const [screen, setScreen] = useState("home")
+  const [category, setCategory] = useState(null)
+  const [label, setLabel] = useState("")
+
   const goHome = () => setScreen("home")
+
+  const handleCategory = (cat, lbl) => {
+    setCategory(cat)
+    setLabel(lbl)
+    setScreen("loading")
+  }
 
   return (
     <>
       <style>{css}</style>
       <Nav onHome={goHome} />
       <div className="page" key={screen}>
-        {screen === "home" && <HomePage onExplore={() => setScreen("category")} />}
+        {screen === "home"     && <HomePage onExplore={() => setScreen("category")} />}
+        {screen === "category" && <CategoryPage onSelect={handleCategory} onBack={goHome} />}
       </div>
     </>
   )
