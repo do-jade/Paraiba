@@ -61,6 +61,303 @@ const css = `
     transition: color 0.2s; margin-bottom: 40px;
   }
   .back:hover { color: #1a1a2e; }
+
+  /* ── HOME ── */
+  .home {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; padding-top: 20px; gap: 0;
+  }
+  .home-eyebrow {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.22em;
+    text-transform: uppercase; color: #2ec4b6; margin-bottom: 18px;
+  }
+  .home-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 5vw, 48px); font-weight: 900;
+    line-height: 1.1; color: #1a1a2e; margin-bottom: 18px;
+    white-space: nowrap;
+  }
+  .home-title em { font-style: italic; color: #2ec4b6; font-weight: 700; }
+  .home-sub {
+    font-size: 14px; color: #6b7280; line-height: 1.8;
+    max-width: 360px; font-weight: 300; margin-bottom: 36px;
+  }
+  .home-btn {
+    padding: 15px 48px; background: #1a1a2e; color: #f7f6f2;
+    border: none; border-radius: 3px;
+    font-family: 'Jost', sans-serif;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+  }
+  .home-btn:hover {
+    background: #2ec4b6;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(46,196,182,0.3);
+  }
+  .home-stats {
+    display: flex; gap: 40px; margin-top: 52px;
+    padding-top: 40px; border-top: 1px solid #e5e3dc;
+  }
+  .stat { text-align: center; }
+  .stat-num {
+    font-family: 'Jost', sans-serif;
+    font-size: 22px; font-weight: 700; color: #1a1a2e;
+    display: block; line-height: 1; letter-spacing: 0.04em;
+  }
+  .stat-label {
+    font-size: 10px; font-weight: 500; letter-spacing: 0.12em;
+    text-transform: uppercase; color: #9ca3af; margin-top: 4px;
+    display: block;
+  }
+    /* ── CATEGORY ── */
+  .cat-header { text-align: center; margin-bottom: 40px; width: 100%; }
+  .cat-eyebrow {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.2em;
+    text-transform: uppercase; color: #2ec4b6; margin-bottom: 10px;
+  }
+  .cat-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px; font-weight: 900; color: #1a1a2e;
+  }
+  .cat-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 12px; width: 100%;
+  }
+  .cat-card {
+    background: #fff; border-radius: 14px;
+    padding: 32px 16px 26px;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 14px;
+    cursor: pointer; border: 1.5px solid #ece9e1;
+    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    position: relative; overflow: hidden;
+  }
+  .cat-card::before {
+    content: ''; position: absolute;
+    inset: 0; background: linear-gradient(135deg, rgba(46,196,182,0.06), transparent);
+    opacity: 0; transition: opacity 0.2s;
+  }
+  .cat-card:hover { transform: translateY(-5px); border-color: #2ec4b6; box-shadow: 0 16px 36px rgba(46,196,182,0.14); }
+  .cat-card:hover::before { opacity: 1; }
+  .cat-icon-wrap {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: #f7f6f2; display: flex;
+    align-items: center; justify-content: center;
+    font-size: 26px; border: 1.5px solid #ece9e1;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .cat-card:hover .cat-icon-wrap { border-color: #2ec4b6; background: rgba(46,196,182,0.06); }
+  .cat-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: #1a1a2e;
+  }
+    /* ── LOADING ── */
+  .loading {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 0;
+    text-align: center;
+  }
+  .loading-visual {
+    position: relative; width: 80px; height: 80px; margin-bottom: 36px;
+  }
+  .loading-ring {
+    width: 80px; height: 80px; border-radius: 50%;
+    border: 1.5px solid #ece9e1;
+    border-top-color: #2ec4b6;
+    animation: spin 1s linear infinite;
+    position: absolute;
+  }
+  .loading-ring-inner {
+    width: 56px; height: 56px; border-radius: 50%;
+    border: 1.5px solid #ece9e1;
+    border-bottom-color: rgba(46,196,182,0.4);
+    animation: spin 1.6s linear infinite reverse;
+    position: absolute; top: 12px; left: 12px;
+  }
+  .loading-gem-sm { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 20px; }
+  .loading-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px; font-weight: 900; color: #1a1a2e; margin-bottom: 10px;
+  }
+  .loading-sub {
+    font-size: 12px; color: #9ca3af; letter-spacing: 0.1em;
+    text-transform: uppercase; margin-bottom: 36px;
+    animation: pulse 1.8s ease infinite;
+  }
+  .loading-steps { display: flex; flex-direction: column; gap: 10px; width: 260px; }
+  .loading-step {
+    display: flex; align-items: center; gap: 12px;
+    font-size: 12px; color: #9ca3af; font-weight: 400;
+  }
+  .loading-step.active { color: #1a1a2e; font-weight: 500; }
+  .step-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #ece9e1; flex-shrink: 0;
+    transition: background 0.3s;
+  }
+  .loading-step.active .step-dot { background: #2ec4b6; }
+  .loading-step.done .step-dot { background: #2ec4b6; }
+  .loading-step.done { color: #6b7280; }
+  /* ── RESULTS ── */
+  .results-header { width: 100%; text-align: center; margin-bottom: 28px; }
+  .results-eyebrow {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.2em;
+    text-transform: uppercase; color: #2ec4b6; margin-bottom: 8px;
+  }
+  .results-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px; font-weight: 900; color: #1a1a2e;
+  }
+  .result-card {
+    width: 100%; background: #fff; border-radius: 14px;
+    padding: 20px 22px; margin-bottom: 10px;
+    display: flex; flex-direction: column; gap: 8px;
+    cursor: pointer; border: 1.5px solid #ece9e1;
+    transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+  }
+  .result-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.07);
+    border-color: #2ec4b6;
+  }
+  .result-card.top { border-color: #2ec4b6; }
+  .result-top-row { display: flex; justify-content: space-between; align-items: center; }
+  .result-num {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: #2ec4b6;
+  }
+  .result-badge {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: #2ec4b6;
+    background: rgba(46,196,182,0.1);
+    padding: 4px 10px; border-radius: 20px;
+  }
+  .result-name {
+    font-size: 15px; font-weight: 600; color: #1a1a2e; line-height: 1.3;
+  }
+  .result-desc {
+    font-size: 12px; color: #6b7280; line-height: 1.7; font-weight: 300;
+  }
+  .result-cta {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: #2ec4b6; align-self: flex-end;
+    margin-top: 4px;
+  }
+  .error-state {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; gap: 16px;
+  }
+  .error-icon { font-size: 40px; }
+  .error-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 900; color: #1a1a2e; }
+  .error-sub { font-size: 13px; color: #6b7280; font-weight: 300; }
+  .error-btn {
+    margin-top: 8px; padding: 12px 32px;
+    background: #1a1a2e; color: #f7f6f2; border: none;
+    border-radius: 3px; font-family: 'Jost', sans-serif;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; cursor: pointer;
+  }
+
+  /* ── DETAIL ── */
+  .detail-breadcrumb {
+    font-size: 11px; color: #9ca3af; letter-spacing: 0.05em;
+    margin-bottom: 20px; align-self: flex-start;
+  }
+  .detail-card {
+    width: 100%; background: #fff; border-radius: 16px;
+    overflow: hidden; border: 1.5px solid #ece9e1; margin-bottom: 16px;
+  }
+  .detail-map {
+    width: 100%; height: 200px;
+    position: relative; overflow: hidden;
+    background: #e4f4f3;
+  }
+  .map-placeholder {
+    width: 100%; height: 100%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 10px; background: #f0faf9;
+    border-bottom: 1.5px dashed #b2e4df;
+  }
+  .map-placeholder-icon { font-size: 28px; }
+  .map-placeholder-text {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.1em;
+    text-transform: uppercase; color: #9ca3af;
+  }
+  .map-placeholder-address {
+    font-size: 12px; color: #2ec4b6; font-weight: 500;
+  }
+  .map-open-btn {
+    position: absolute; bottom: 12px; right: 12px;
+    background: #1a1a2e; color: #f7f6f2;
+    font-family: 'Jost', sans-serif;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; border: none; border-radius: 4px;
+    padding: 7px 14px; cursor: pointer;
+    transition: background 0.2s;
+    text-decoration: none; display: flex; align-items: center; gap: 6px;
+  }
+  .map-open-btn:hover { background: #2ec4b6; }
+  .detail-body { padding: 24px 26px; }
+  .detail-cat {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.18em;
+    text-transform: uppercase; color: #2ec4b6; margin-bottom: 8px;
+  }
+  .detail-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px; font-weight: 900; color: #1a1a2e;
+    margin-bottom: 12px; line-height: 1.2;
+  }
+  .detail-desc {
+    font-size: 13px; color: #6b7280; line-height: 1.8; font-weight: 300;
+    margin-bottom: 18px;
+  }
+  .detail-meta {
+    display: flex; justify-content: space-between; padding-top: 16px;
+    border-top: 1px solid #f0ede6;
+  }
+  .meta-item { display: flex; flex-direction: column; align-items: center; gap: 2px; flex: 1; }
+  .meta-label {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.14em;
+    text-transform: uppercase; color: #9ca3af;
+  }
+  .meta-value { font-size: 13px; font-weight: 600; color: #1a1a2e; }
+  .comments-heading {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.18em;
+    text-transform: uppercase; color: #9ca3af;
+    margin-bottom: 12px; align-self: flex-start;
+  }
+  .comment-card {
+    width: 100%; background: #fff; border-radius: 10px;
+    padding: 15px 18px; margin-bottom: 8px;
+    display: flex; justify-content: space-between;
+    align-items: flex-start; gap: 16px;
+    border: 1.5px solid #ece9e1;
+    transition: border-color 0.2s;
+  }
+  .comment-card:hover { border-color: rgba(46,196,182,0.4); }
+  .comment-body { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+  .comment-text { font-size: 13px; color: #374151; line-height: 1.65; font-weight: 300; }
+  .comment-source { font-size: 10px; color: #9ca3af; font-weight: 500; letter-spacing: 0.04em; }
+  .comment-upvotes {
+    font-size: 11px; font-weight: 700; color: #2ec4b6;
+    white-space: nowrap; background: rgba(46,196,182,0.08);
+    padding: 4px 10px; border-radius: 20px; flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 520px) {
+    .page { padding: 90px 18px 60px; }
+    .home-stats { gap: 24px; }
+    .cat-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .cat-card { padding: 24px 10px 20px; }
+    .cat-icon-wrap { width: 50px; height: 50px; font-size: 20px; }
+    .home-title { font-size: 28px; }
+  }
 `
 
 const PLACES = {
@@ -127,17 +424,210 @@ function BackBtn({ onClick }) {
   )
 }
 
+function HomePage({ onExplore }) {
+  return (
+    <div className="home">
+      <div className="fu"><GemLogo size={52} /></div>
+      <p className="home-eyebrow fu1">Powered by local Reddit discussions</p>
+      <h1 className="home-title fu2">Find the <em>hidden gems</em> of your city.</h1>
+      <p className="home-sub fu3">
+        We parse thousands of Reddit posts, extract sentiment, and rank local spots that tourists never find.
+      </p>
+      <button className="home-btn fu4" onClick={onExplore}>Start Exploring</button>
+      <div className="home-stats fu5">
+        <div className="stat">
+          <span className="stat-num">10k+</span>
+          <span className="stat-label">Posts Analyzed</span>
+        </div>
+        <div className="stat">
+          <span className="stat-num">r/GNV</span>
+          <span className="stat-label">Source Subreddit</span>
+        </div>
+        <div className="stat">
+          <span className="stat-num">Top 5</span>
+          <span className="stat-label">Per Category</span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function CategoryPage({ onSelect, onBack }) {
+  const cats = [
+    { key: "restaurants", label: "Restaurants" },
+    { key: "cafes", label: "Cafes" },
+    { key: "parks", label: "Parks" },
+  ]
+  return (
+    <>
+      <BackBtn onClick={onBack} />
+      <div className="cat-header fu">
+        <p className="cat-eyebrow">Step 1 of 1</p>
+        <h2 className="cat-title">What are you exploring?</h2>
+      </div>
+      <div className="cat-grid">
+        {cats.map((c, i) => (
+          <div key={c.key} className={`cat-card fu${i + 1}`} onClick={() => onSelect(c.key, c.label)}>
+            <div className="cat-icon-wrap">{ICONS[c.key]}</div>
+            <span className="cat-label">{c.label}</span>
+          </div>
+        ))}
+      </div>
+    </>
+  )
+}
+function LoadingPage({ label, step }) {
+  const steps = [
+    { label: "Scraping r/GNV posts", done: step > 0, active: step === 0 },
+    { label: `Extracting ${label} mentions`, done: step > 1, active: step === 1 },
+    { label: "Running sentiment analysis", done: step > 2, active: step === 2 },
+    { label: "Ranking results", done: step > 3, active: step === 3 },
+  ]
+  return (
+    <div className="loading">
+      <div className="loading-visual">
+        <div className="loading-ring" />
+        <div className="loading-ring-inner" />
+        <div className="loading-gem-sm">💎</div>
+      </div>
+      <p className="loading-title">Analyzing discussions</p>
+      <p className="loading-sub">Finding hidden gems for {label}</p>
+      <div className="loading-steps">
+        {steps.map((s, i) => (
+          <div key={i} className={`loading-step${s.active ? " active" : ""}${s.done ? " done" : ""}`}>
+            <div className="step-dot" />
+            {s.done ? "✓ " : ""}{s.label}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+function ResultsPage({ category, label, onSelect, onBack }) {
+  const places = PLACES[category] || []
+
+  if (places.length === 0) {
+    return (
+      <div className="error-state">
+        <span className="error-icon">🔍</span>
+        <p className="error-title">No results found</p>
+        <p className="error-sub">Try a different category</p>
+        <button className="error-btn" onClick={onBack}>Go Back</button>
+      </div>
+    )
+  }
+
+  return (
+    <>
+      <div className="results-header fu">
+        <p className="results-eyebrow">Hidden Gems — {label}</p>
+        <h2 className="results-title">Top 5 local picks</h2>
+      </div>
+      {places.map((p, i) => (
+        <div
+          key={p.id}
+          className={`result-card fu${Math.min(i + 1, 5)}${i === 0 ? " top" : ""}`}
+          onClick={() => onSelect(p)}
+        >
+          <div className="result-top-row">
+            <span className="result-num">#{p.id}</span>
+            <span className="result-badge">Hidden Gem</span>
+          </div>
+          <p className="result-name">{p.name}</p>
+          <p className="result-desc">{p.desc}</p>
+          <span className="result-cta">View details →</span>
+        </div>
+      ))}
+    </>
+  )
+}
+
+function PlaceMap({ place }) {
+  const address = place.address || `${place.name}, Gainesville, FL`
+  const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`
+  return (
+    <div className="detail-map">
+      <div className="map-placeholder">
+        <span className="map-placeholder-icon">📍</span>
+        <span className="map-placeholder-text">Map coming soon</span>
+        <span className="map-placeholder-address">{address}</span>
+      </div>
+      <a className="map-open-btn" href={googleMapsUrl} target="_blank" rel="noopener noreferrer">
+        ↗ Open in Google Maps
+      </a>
+    </div>
+  )
+}
+
+function DetailPage({ place, label, onBack }) {
+  return (
+    <>
+      <BackBtn onClick={onBack} />
+      <p className="detail-breadcrumb fu">{label} / {place.name}</p>
+      <div className="detail-card fu1">
+        <PlaceMap place={place} />
+        <div className="detail-body">
+          <p className="detail-cat">{label}</p>
+          <h2 className="detail-name">{place.name}</h2>
+          <p className="detail-desc">{place.desc}</p>
+          <div className="detail-meta">
+            <div className="meta-item">
+              <span className="meta-label">Sentiment</span>
+              <span className="meta-value">{place.sentiment}</span>
+            </div>
+            <div className="meta-item">
+              <span className="meta-label">Reddit Mentions</span>
+              <span className="meta-value">{place.mentions}</span>
+            </div>
+            <div className="meta-item">
+              <span className="meta-label">Ranking</span>
+              <span className="meta-value">#{place.id} in {label}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p className="comments-heading fu2">What locals are saying</p>
+      {COMMENTS.map((c, i) => (
+        <div key={i} className={`comment-card fu${Math.min(i + 2, 5)}`}>
+          <div className="comment-body">
+            <span className="comment-text">"{c.text}"</span>
+            <span className="comment-source">{c.source}</span>
+          </div>
+          <span className="comment-upvotes">↑ {c.upvotes}</span>
+        </div>
+      ))}
+    </>
+  )
+}
+
 export default function App() {
   const [screen, setScreen] = useState("home")
+  const [category, setCategory] = useState(null)
+  const [label, setLabel] = useState("")
+  const [loadStep, setLoadStep] = useState(0)
+  const [place, setPlace] = useState(null)
 
-  const goHome = () => setScreen("home")
+  const goHome = () => { setScreen("home"); setLoadStep(0) }
+
+  const handleCategory = (cat, lbl) => {
+    setCategory(cat); setLabel(lbl); setLoadStep(0)
+    setScreen("loading")
+    ;[0, 1, 2, 3].forEach(i => {
+      setTimeout(() => setLoadStep(i + 1), 500 + i * 500)
+    })
+    setTimeout(() => setScreen("results"), 2600)
+  }
 
   return (
     <>
       <style>{css}</style>
       <Nav onHome={goHome} />
       <div className="page" key={screen}>
-        <p>Paraíba — screen: {screen}</p>
+        {screen === "home"     && <HomePage onExplore={() => setScreen("category")} />}
+        {screen === "category" && <CategoryPage onSelect={handleCategory} onBack={goHome} />}
+        {screen === "loading"  && <LoadingPage label={label} step={loadStep} />}
+        {screen === "results"  && <ResultsPage category={category} label={label} onSelect={(p) => { setPlace(p); setScreen("detail") }} onBack={() => setScreen("category")} />}
+        {screen === "detail"   && <DetailPage place={place} label={label} onBack={() => setScreen("results")} />}
       </div>
     </>
   )
