@@ -260,6 +260,104 @@ const css = `
     font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
     text-transform: uppercase; cursor: pointer;
   }
+
+  /* ── DETAIL ── */
+  .detail-breadcrumb {
+    font-size: 11px; color: #9ca3af; letter-spacing: 0.05em;
+    margin-bottom: 20px; align-self: flex-start;
+  }
+  .detail-card {
+    width: 100%; background: #fff; border-radius: 16px;
+    overflow: hidden; border: 1.5px solid #ece9e1; margin-bottom: 16px;
+  }
+  .detail-map {
+    width: 100%; height: 200px;
+    position: relative; overflow: hidden;
+    background: #e4f4f3;
+  }
+  .map-placeholder {
+    width: 100%; height: 100%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 10px; background: #f0faf9;
+    border-bottom: 1.5px dashed #b2e4df;
+  }
+  .map-placeholder-icon { font-size: 28px; }
+  .map-placeholder-text {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.1em;
+    text-transform: uppercase; color: #9ca3af;
+  }
+  .map-placeholder-address {
+    font-size: 12px; color: #2ec4b6; font-weight: 500;
+  }
+  .map-open-btn {
+    position: absolute; bottom: 12px; right: 12px;
+    background: #1a1a2e; color: #f7f6f2;
+    font-family: 'Jost', sans-serif;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; border: none; border-radius: 4px;
+    padding: 7px 14px; cursor: pointer;
+    transition: background 0.2s;
+    text-decoration: none; display: flex; align-items: center; gap: 6px;
+  }
+  .map-open-btn:hover { background: #2ec4b6; }
+  .detail-body { padding: 24px 26px; }
+  .detail-cat {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.18em;
+    text-transform: uppercase; color: #2ec4b6; margin-bottom: 8px;
+  }
+  .detail-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px; font-weight: 900; color: #1a1a2e;
+    margin-bottom: 12px; line-height: 1.2;
+  }
+  .detail-desc {
+    font-size: 13px; color: #6b7280; line-height: 1.8; font-weight: 300;
+    margin-bottom: 18px;
+  }
+  .detail-meta {
+    display: flex; justify-content: space-between; padding-top: 16px;
+    border-top: 1px solid #f0ede6;
+  }
+  .meta-item { display: flex; flex-direction: column; align-items: center; gap: 2px; flex: 1; }
+  .meta-label {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.14em;
+    text-transform: uppercase; color: #9ca3af;
+  }
+  .meta-value { font-size: 13px; font-weight: 600; color: #1a1a2e; }
+  .comments-heading {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.18em;
+    text-transform: uppercase; color: #9ca3af;
+    margin-bottom: 12px; align-self: flex-start;
+  }
+  .comment-card {
+    width: 100%; background: #fff; border-radius: 10px;
+    padding: 15px 18px; margin-bottom: 8px;
+    display: flex; justify-content: space-between;
+    align-items: flex-start; gap: 16px;
+    border: 1.5px solid #ece9e1;
+    transition: border-color 0.2s;
+  }
+  .comment-card:hover { border-color: rgba(46,196,182,0.4); }
+  .comment-body { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+  .comment-text { font-size: 13px; color: #374151; line-height: 1.65; font-weight: 300; }
+  .comment-source { font-size: 10px; color: #9ca3af; font-weight: 500; letter-spacing: 0.04em; }
+  .comment-upvotes {
+    font-size: 11px; font-weight: 700; color: #2ec4b6;
+    white-space: nowrap; background: rgba(46,196,182,0.08);
+    padding: 4px 10px; border-radius: 20px; flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 520px) {
+    .page { padding: 90px 18px 60px; }
+    .home-stats { gap: 24px; }
+    .cat-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .cat-card { padding: 24px 10px 20px; }
+    .cat-icon-wrap { width: 50px; height: 50px; font-size: 20px; }
+    .home-title { font-size: 28px; }
+  }
 `
 
 const PLACES = {
@@ -444,6 +542,64 @@ function ResultsPage({ category, label, onSelect, onBack }) {
   )
 }
 
+function PlaceMap({ place }) {
+  const address = place.address || `${place.name}, Gainesville, FL`
+  const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`
+  return (
+    <div className="detail-map">
+      <div className="map-placeholder">
+        <span className="map-placeholder-icon">📍</span>
+        <span className="map-placeholder-text">Map coming soon</span>
+        <span className="map-placeholder-address">{address}</span>
+      </div>
+      <a className="map-open-btn" href={googleMapsUrl} target="_blank" rel="noopener noreferrer">
+        ↗ Open in Google Maps
+      </a>
+    </div>
+  )
+}
+
+function DetailPage({ place, label, onBack }) {
+  return (
+    <>
+      <BackBtn onClick={onBack} />
+      <p className="detail-breadcrumb fu">{label} / {place.name}</p>
+      <div className="detail-card fu1">
+        <PlaceMap place={place} />
+        <div className="detail-body">
+          <p className="detail-cat">{label}</p>
+          <h2 className="detail-name">{place.name}</h2>
+          <p className="detail-desc">{place.desc}</p>
+          <div className="detail-meta">
+            <div className="meta-item">
+              <span className="meta-label">Sentiment</span>
+              <span className="meta-value">{place.sentiment}</span>
+            </div>
+            <div className="meta-item">
+              <span className="meta-label">Reddit Mentions</span>
+              <span className="meta-value">{place.mentions}</span>
+            </div>
+            <div className="meta-item">
+              <span className="meta-label">Ranking</span>
+              <span className="meta-value">#{place.id} in {label}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p className="comments-heading fu2">What locals are saying</p>
+      {COMMENTS.map((c, i) => (
+        <div key={i} className={`comment-card fu${Math.min(i + 2, 5)}`}>
+          <div className="comment-body">
+            <span className="comment-text">"{c.text}"</span>
+            <span className="comment-source">{c.source}</span>
+          </div>
+          <span className="comment-upvotes">↑ {c.upvotes}</span>
+        </div>
+      ))}
+    </>
+  )
+}
+
 export default function App() {
   const [screen, setScreen] = useState("home")
   const [category, setCategory] = useState(null)
@@ -471,6 +627,7 @@ export default function App() {
         {screen === "category" && <CategoryPage onSelect={handleCategory} onBack={goHome} />}
         {screen === "loading"  && <LoadingPage label={label} step={loadStep} />}
         {screen === "results"  && <ResultsPage category={category} label={label} onSelect={(p) => { setPlace(p); setScreen("detail") }} onBack={() => setScreen("category")} />}
+        {screen === "detail"   && <DetailPage place={place} label={label} onBack={() => setScreen("results")} />}
       </div>
     </>
   )
