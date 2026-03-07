@@ -2,6 +2,7 @@
 
 import re #regex for cleaning up entities
 import spacy #import spacy NER
+
 class spaCyEntities:
     def __init__(self):
         self.nlp = self.build_nlp() #initialize nlp with custom patterns below
@@ -12,122 +13,305 @@ class spaCyEntities:
         #the patterns are ran before the natural entity processing spaCy does and the patterns will overwrite what spaCy gives
         #basically want to ensure that all locations and restuarants are labeled as places to be picked up later
 
+        placeEnders = [ #Names of places with these at the end
+            "bbq", "grill", "grille", "kitchen", "market", "deli", "cafe", "café",
+            "store", "pizza", "sushi", "thai", "bistro", "bar", "house", "shack",
+            "boil", "wings", "burgers", "tacos", "eatery", "donuts", "bakery",
+            "cream", "spice", "garden", "gardens", "ramen", "poke", "pocha", "momo",
+            "seafood", "steaks", "sandwich", "sandwiches", "bagels", "cheesesteaks",
+            "barbeque", "barbecue", "noodles", "winery", "brewery", "lounge", "diner",
+            "truck", "station", "park", "preserve", "trail", "zoo", "co.", "co",
+            "farm", "skatepark", "springs", "wetlands", "forest", "overlook"
+        ]
+
+        beforeTriggers = [ #words before place name that trigger it
+            "try", "tried", "visit", "visited", "love", "loved", "like", "liked",
+            "ate", "dined", "recommend", "recommending", "about", "from", "called"
+        ]
+
+        # Strict connectors — only prepositions/articles, NOT "and" (too greedy)
+        betweenWords = ["of", "de", "du", "el", "le", "les", "di", "del", "von", "van", "n", "by"]
+
+        capitalized = r"^[A-Z][A-Za-z]+$" #Captitalized words
+        anyCapitalizedWord = r"^[A-Z][A-Za-z]*$" #Capitalized words that are broken
+
+        #above are for matching with Spacy bc it does a bad job
+
         patterns = [ #custom patterns created specifically to pick up restuarants and attractions
-            {"label": "PLACE", "pattern": [ #This pattern matches for the test, honestly it can probably be removed
-                {"IS_TITLE": True},
-                {"TEXT": "'s"},  
-                {"IS_TITLE": True, "OP": "+"}
-            ]},
-            # This is to pick up names with 2 capitalized letters and a description about it EX: Hana Sushi grill picks up the first two as well as grill in list
-            #This will not pick up Sushi Grill as Grill is a suffix, may have to fix later
-            {"label": "PLACE", "pattern": [ #label is set to PLACE for pick up later
-                {"IS_TITLE": True}, #picks the first captitalized word
-                {"IS_TITLE": True, "OP": "+"}, #OP + is get at least 2 captitalized words
-                {"LOWER": {"IN": ["grill","bbq","kitchen","market","deli","cafe","café", "store"]}} #need to make this longer to accept more
-            ]},
-
-            # This pattern is to pick up verbs people would place infront of a place
+            #possesive names
             {"label": "PLACE", "pattern": [
-                {"LOWER": {"IN": ["try","visit","visited","loved","love","ate","dined", "be", "liked", "and", "or",]}}, #trigger the match like "loved Satchel's", however wont pick up ate yesterday 
-                {"IS_TITLE": True, "OP": "+"} #grabs the title
+                {"TEXT": {"REGEX": r"^[A-Z][A-Za-z]{1,}(\u2019s|'s|'s|')?$"}},
+                {"TEXT": {"IN": ["\u2019s", "'s", "'s", "'"]}, "OP": "?"},
+                {"TEXT": {"REGEX": capitalized}, "OP": "*"}
             ]},
 
-            # Continues the trigger word but adds the two in for go and went Ex went to Marks
+            # names with &
             {"label": "PLACE", "pattern": [
-                {"LOWER": {"IN": ["go","went"]}}, #if the sentence has go or went
-                {"LOWER": "to"}, #and the next word is to
-                {"IS_TITLE": True, "OP": "+"} #then grab the title of the restuarant and other titles capitalized afterwards
-                #I need to create more lowercase patterns 
+                {"TEXT": {"REGEX": anyCapitalizedWord}},
+                {"TEXT": {"IN": ["&", "&amp;"]}},
+                {"TEXT": {"REGEX": anyCapitalizedWord}},
+                {"TEXT": {"REGEX": capitalized}, "OP": "*"}
             ]},
 
-            # pattern matches titles after the word at Ex at El Indio
+            # Both sides must be single capitalized words with the word "and" between them
             {"label": "PLACE", "pattern": [
-                {"LOWER": "at"}, #is at is before titel
-                {"IS_TITLE": True, "OP": "+"} #grab the title and any others after it
+                {"TEXT": {"REGEX": capitalized}},
+                {"LOWER": "and"},
+                {"TEXT": {"REGEX": capitalized}}
             ]},
 
-            # pattern matches describing the food category with a semicolon and picks up the title and other capitalized words after EX thai: Green Papaya
-            #This was a common listing method in some subreddits, more of an edge case
+            # amepersand with no spaces
             {"label": "PLACE", "pattern": [
-                {"LOWER": {"IN": ["thai","pho","jamaican","chinese","burger","bread","mexican","southern","sandwiches","gyro"]}}, #
-                {"TEXT": ":"},
-                {"IS_TITLE": True},
-                {"IS_TITLE": True, "OP": "?"},
-                {"IS_TITLE": True, "OP": "?"},
-                {"IS_TITLE": True, "OP": "?"},
+                {"TEXT": {"REGEX": r"^[A-Z](&[A-Z])+$"}},
+                {"TEXT": {"REGEX": capitalized}, "OP": "*"},
+                {"LOWER": {"IN": placeEnders}, "OP": "?"}
             ]},
 
-            #pattern matches a title and extra titles before the words has, is, was again another edge case EX Paper Bag Deli is ...
+            # capitalized word with any of the place enders above
             {"label": "PLACE", "pattern": [
-                {"IS_TITLE": True, "OP": "+"},
-                {"LOWER": {"IN": ["has","is","was"]}}
+                {"TEXT": {"REGEX": anyCapitalizedWord}, "OP": "+"},
+                {"LOWER": {"IN": placeEnders}}
             ]},
 
-            # pattern matches for apostrophes EX DJ's, this may need to be tweaked also grabs words after
+            # Capitalized word with a place ender eventually
             {"label": "PLACE", "pattern": [
-                {"TEXT": {"REGEX": r"^[A-Z][A-Za-z]{1,}('s| 's)?$"}}, #this regex is to get a capital letter then accept any letter with a name greater than 1 char and has 's
-                {"TEXT": {"IN": ["'s", "'s"]}},
-                {"TEXT": {"REGEX": r"^([A-Z][a-z]+|grill|bbq|kitchen|market|deli|cafe|café|pizza|burgers)$"}, "OP": "*"} #this grabs any title case after OR any lowercase common places
+                {"TEXT": {"REGEX": capitalized}},
+                {"TEXT": {"REGEX": r"^[a-z]+$"}, "OP": "?"},
+                {"LOWER": {"IN": placeEnders}}
             ]},
 
-            {"label": "PLACE", "pattern": [ #for possesive names only
-                {"TEXT": {"REGEX": r"^[A-Z][A-Za-z]{1,}$"}},  # Capitalized word
-                {"TEXT": {"IN": ["'s", "'s"]}}  # Followed by 's
-            ]},
-            
+            # Words in that trigger location names
             {"label": "PLACE", "pattern": [
-                {"TEXT": {"IN": [","]}},
-                {"IS_TITLE": True, "OP": "+"} #This gets lists 
+                {"LOWER": {"IN": beforeTriggers}},
+                {"TEXT": {"REGEX": capitalized}, "OP": "+"}
             ]},
 
-            #There are more patterns to add to get more generalized entity rulings
+            # At a place
+            {"label": "PLACE", "pattern": [
+                {"LOWER": "at"},
+                {"TEXT": {"REGEX": capitalized}, "OP": "+"}
+            ]},
+
+            # Go/went to place
+            {"label": "PLACE", "pattern": [
+                {"LOWER": {"IN": ["go", "went"]}},
+                {"LOWER": "to"},
+                {"TEXT": {"REGEX": capitalized}, "OP": "+"}
+            ]},
+
+            # location is/was/has
+            {"label": "PLACE", "pattern": [
+                {"TEXT": {"REGEX": capitalized}, "OP": "+"},
+                {"LOWER": {"IN": ["is", "was", "has"]}}
+            ]},
+
+            # list separated by commas
+            {"label": "PLACE", "pattern": [
+                {"TEXT": ","},
+                {"TEXT": {"REGEX": capitalized}, "OP": "+"}
+            ]},
+
+            # list separated by commas but with lowercase names
+            {"label": "PLACE", "pattern": [
+                {"TEXT": ","},
+                {"TEXT": {"REGEX": r"^[a-z][a-z]+$"}},
+                {"LOWER": {"IN": placeEnders}, "OP": "?"}
+            ]},
+
+            # bullets and dashed lists
+            {"label": "PLACE", "pattern": [
+                {"TEXT": {"IN": ["·", "-", "*", "\u2013", "\u2022"]}},
+                {"TEXT": {"REGEX": capitalized}, "OP": "+"}
+            ]},
+
+            # Two consecutive capitalized words
+            {"label": "PLACE", "pattern": [
+                {"TEXT": {"REGEX": capitalized}},
+                {"TEXT": {"REGEX": capitalized}}
+            ]},
+
+            # capitatlized plus connectors plus capitalized
+            {"label": "PLACE", "pattern": [
+                {"TEXT": {"REGEX": capitalized}},
+                {"LOWER": {"IN": betweenWords}},
+                {"TEXT": {"REGEX": capitalized}}
+            ]},
+
+            # Three consecutive captialized words
+            {"label": "PLACE", "pattern": [
+                {"TEXT": {"REGEX": capitalized}},
+                {"TEXT": {"REGEX": capitalized}},
+                {"TEXT": {"REGEX": capitalized}}
+            ]},
+
+            # Four captitalized words
+            {"label": "PLACE", "pattern": [
+                {"TEXT": {"REGEX": capitalized}},
+                {"TEXT": {"REGEX": capitalized}},
+                {"TEXT": {"REGEX": capitalized}},
+                {"TEXT": {"REGEX": capitalized}}
+            ]},
         ]
 
         ruler.add_patterns(patterns) #load all patterns to entity ruler
         return nlp #return the nlp object with custom patterns added in
 
-    def clean_entity(self, text: str): #cleans up the entities and returns a string
-        text = text.replace("'", "'").replace(""",'"').replace(""", '"') #This gets rid of extra quotes
-        text = re.sub(r"\s+", " ", text).strip() #remove extra whitespace that occurs around apostrophes
+    def clean_entity(self, text: str):
+        text = text.replace("\u2019", "'").replace("\u2018", "'")
+        text = text.replace("\u201c", '"').replace("\u201d", '"')
+        text = text.replace("&amp;", "&")
+        # Strip words with *, -, " "
+        text = re.sub(r"^\*+", "", text)
+        text = re.sub(r"^-+", "", text)
+        text = re.sub(r"\s+", " ", text).strip()
 
         words = text.split()
-        rmFront = {"at", "has", "is", "was", "are", "were", "liked", "be", "the", "a", "an", "thai", "pho", "jamaican", "chinese", 
-                   "burger", "bread",  "mexican", "southern", "sandwiches", "gyro", "indian", "and", "or", ",", "but", "visitd", "ate", "went"}
-        #above is a list of words to remove, will have to add more as time goes on
-        while words and words[0].lower().strip(":") in rmFront: #get rid of leading words not part of the entity name
-            words.pop(0)
-        while words and words[0] == ":": 
-            words.pop(0) #this is an edge case to remove colon from the front of the resturant name
 
-        rmBack = {"has", "is", "was", "are", "were"}
-        while words and words[-1].lower() in rmBack:
+        rmFront = { #list of words to remove, will have to add more as time goes on
+            "at", "has", "is", "was", "are", "were", "liked", "loved", "like",
+            "be", "the", "a", "an", "try", "tried", "visit", "visited", "ate",
+            "went", "to", "about", "from", "for", "and", "or", ",", "·", "-", "*",
+            "–", "•", "recommend", "inside", "called", "it's", "its", "also",
+            "formerly", "but", "while", "across", "big"
+        }
+        while words and words[0].lower().strip(":,·*–•-") in rmFront: #Remove the extra characters
+            words.pop(0)
+        while words and words[0] in {"·", "-", "*", "–", "•", ","}: #remove more extra characters
+            words.pop(0)
+
+        rmBack = {"has", "is", "was", "are", "were", "where"} #remove words from back of extracted locations
+        while words and words[-1].lower() in rmBack: #pop the words not needed
             words.pop()
-        text = " ".join(words).strip() #gets all words back together 
-        if len(text) < 2: #remove empty entities
+
+        wordSplit = {"where", "which", "that", "who", "because", "since", #words that show two different sides
+                       "although", "though", "unless", "until", "while"}
+        for i, w in enumerate(words):
+            if w.lower() in wordSplit:
+                words = words[:i]
+                break
+
+        text = " ".join(words).strip() #join after taking these words out
+
+        if len(text) < 2:
+            return "" #Do not return if less than 2 chars
+
+        beginWords = { #remove these words that commonly show up in the beginning of the location name
+            "not", "so", "my", "best", "honestly", "although", "definitely",
+            "they", "the", "this", "that", "those", "these", "there", "then",
+            "we", "you", "he", "she", "it", "i", "and", "but", "or", "also",
+            "just", "never", "most", "some", "any", "all", "no", "yes", "if",
+            "when", "where", "how", "what", "who", "why", "as", "with",
+            "good", "great", "very", "really", "probably", "plus", "does",
+            "everyone", "everything", "anyone", "nothing", "edit", "new",
+            "def", "giant", "unassuming", "authentic", "tons", "la", "hmm",
+            "two", "people", "take", "hey", "beef", "cash", "brunch", "watching",
+            "only", "check", "none", "maybe", "smash", "thicker", "consistent",
+            "stir", "oddly", "congratulations", "last", "again", "reviews",
+            "hopefully", "lesser", "tasty", "small", "their", "oh", "might",
+            "second", "jazz", "here", "both", "big", "never", "oops",
+            "rosemary", "gouda", "veggie", "chimichurri", "scallop", "tuna",
+        }
+
+        dayWords = { #remove dayWords of the week, they are generally capitalized
+            "monday", "tuesday", "wednesday", "thursday", "friday",
+            "saturday", "sunday", "tuesdayWords", "sundayWords", "mondayWords",
+        }
+
+        cuisneWords = { #remove most cuisine words
+            "thai", "korean", "chinese", "mexican", "italian", "indian",
+            "african", "caribbean", "egyptian", "vietnamese", "cambodian",
+            "mediterranean", "japanese", "american", "southern", "cajun",
+            "french", "spanish", "greek", "turkish", "ethiopian",
+        }
+
+        generals = { #remove generic words found throught the current comments DB
+            "university", "main", "street", "avenue", "road", "boulevard",
+            "lane", "way", "court", "place", "north", "south", "east", "west",
+            "downtown", "uptown", "alachua", "micanopy", "newberry",
+            "gainesville", "ocala", "williston", 
+            "tower", "archer", "tractor", "supply", "ave", "st", "rd",
+             "rec", "parks", "city", "facebook", 
+            "hawthorne", "duval", "buffalo", "falafel", "tex",
+            "asian", "ting", "shake", "chicken", "burrito",
+        }
+
+        xtraStuffFound = { #These are things that wont get out so far
+            # food descriptors
+            "mexican food", "chinese food", "korean food", "caribbean food",
+            "italian food", "egyptian food", "african cuisine", "cambodian food",
+            "indian cuisine", "thai food", "great mexican food", "best burgers",
+            "good food", "tasty food", "good italian food", "great mexican",
+            "cajun vietnamese", "good italian", "love indian cuisine",
+            # dishes not restaurants
+            "coco bread", "double wrapped", "not just pizza",
+            "chimichurri sandwich", "scallop burrito", "tuna pesto melt",
+            "everything bagel", "bulgogi omlette", "tofu fish sandwich",
+            "augusta chicken sandwich", "calabrian wings", "their monte cristo",
+            "le croque", "carribbean spice spicy beef patty", "burrito brothers primo beef burrito",
+            # generic phrases
+            "motor city", "outdoor bbq", "south american", "best cheese steaks",
+            "gas station", "convenience store", "taco truck", "ave food park",
+            "tractor supply", "sirloin steaks", "korean barbeque",
+            "it was formerly", "not gnv", "fried chicken sandwich",
+            "dog gone good diner", "so good", "university and main",
+            "tower and archer", "tienda and boca", "vietnamese and thai",
+            "thai and i", "city of gainesville", "parks & rec", "parks and rec",
+            "giant amazing deli", "wetlands preserve", "high springs", "miccanopy",
+            "newberry rd", "millhopper plaza", "mexican eatery",
+            "daybreakgnv", "monsieur", "tex mex", "tex-mex",
+        }
+
+        if text.lower() in xtraStuffFound: #return empty if it is in the extra set
             return ""
-        extraWords = {"the", "a", "an", "and", "or", "but", "my", "our", "this", "that", "has", "is", "was", "are", "were", "been", "it's"} #going to need more of these
-        if text.lower() in extraWords: #get rid of filler/ extra words that might throw google off
-            return ""
-        extraUpperWords = {"That's"} #extra edge case to catch uppercase words, will need to add more
-        if text in extraUpperWords:
-            return ""
-        return text #return the entity back
+
+        #for below it does not return the things above as well as lowercase words or word length less than 4 (This may be a miskate)
+        if len(text.split()) == 1:
+            if text.lower() in beginWords: 
+                return ""
+            if text.lower() in dayWords:
+                return ""
+            if text.lower() in cuisneWords:
+                return ""
+            if text.lower() in generals:
+                return ""
+            if text.islower():
+                return ""
+            if text.isupper() and len(text) <= 4:
+                return ""
+
+        commonWords = { #common words to get rid of
+            "the", "a", "an", "and", "or", "of", "in", "on", "at", "to",
+            "for", "with", "my", "their", "is", "are", "was", "were", "has",
+            "food", "place", "restaurant", "best", "good", "great", "amazing",
+            "authentic", "fresh", "quality", "portions", "most", "ever", "how",
+            "worth", "drive", "certainly", "underrated", "incredible", "all",
+            "about", "but", "does", "hold", "candle", "can", "see", "some",
+            "pretty", "cool", "wildlife", "like", "deer", "gators", "sorts",
+            "free", "nature", "parks", "get", "smoked", "sausage", "daily",
+            "specials", "puts", "together", "tasty", "hole", "wall", "chain",
+            "restaurants", "than", "more", "from", "been", "spectacular", "just",
+            "not", "only", "pizza", "sandwich", "burrito", "melt", "bagel",
+        }
+        word_list = text.split()
+        if len(word_list) > 2: #This removes these words from the list
+            common_count = sum(1 for w in word_list if w.lower() in commonWords)
+            if common_count / len(word_list) > 0.4:
+                return ""
+
+        return text
 
     def extract_locations(self, text: str): #extract the locations from text and return a list of all locations processed
+        text = re.sub(r"/", " / ", text) #replace " "
+        text = text.replace("&amp;", "&") #replace amersands
         #below are to clean the text because spacy cannot get them correct for whatever reason
-        text = text.replace('\u2019', "'")
-        text = text.replace('\u2018', "'")
-        text = text.replace('\u201c', '"')
-        text = text.replace('\u201d', '"')
+        text = (text
+                .replace("\u2019", "'").replace("\u2018", "'") 
+                .replace("\u201c", '"').replace("\u201d", '"'))
 
-        doc = self.nlp(text) #load in the text
+        doc = self.nlp(text) #load in text from Mongo
 
-        locations = [] #store all cleaned locations from each input
+        locations = [] #stored all cleaned locations
         noDups = set() #set to store unique locations, may not need this
-
-        for ent in doc.ents:
-            if (ent.label_ == "PLACE"):
-                cleaned = self.clean_entity(ent.text)
 
         for ent in doc.ents: #for all entites
             if (ent.label_ == "PLACE"): #get only places as it was the one picked in the custom patterns
@@ -136,9 +320,8 @@ class spaCyEntities:
                     locations.append(cleaned) #add to list if cleaned
                     noDups.add(cleaned.lower()) #add to set in case of duplicates, also puts to lower to ensure that different spellings get checked
         return locations
-    
 
 
 def spaCy_full(text: str): #runs entire class
     entities = spaCyEntities()
-    return entities.extract_locations(text) #returns list of all entities
+    return entities.extract_locations(text) #runs list of all entities
