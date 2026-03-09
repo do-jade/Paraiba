@@ -228,6 +228,7 @@ const css = `
     font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
     text-transform: uppercase; color: #2ec4b6;
   }
+  .results-title span { font-style: italic; color: #2ec4b6; }
   .result-badge {
     font-size: 9px; font-weight: 700; letter-spacing: 0.12em;
     text-transform: uppercase; color: #2ec4b6;
@@ -519,9 +520,10 @@ function ResultsPage({ category, label, onSelect, onBack }) {
 
   return (
     <>
+      <BackBtn onClick={onBack} />
       <div className="results-header fu">
-        <p className="results-eyebrow">Hidden Gems — {label}</p>
-        <h2 className="results-title">Top 5 local picks</h2>
+        <p className="results-eyebrow">Ranked by sentiment + local engagement</p>
+        <h2 className="results-title">Top <span>{label}</span> in GNV</h2>
       </div>
       {places.map((p, i) => (
         <div
@@ -530,7 +532,7 @@ function ResultsPage({ category, label, onSelect, onBack }) {
           onClick={() => onSelect(p)}
         >
           <div className="result-top-row">
-            <span className="result-num">#{p.id}</span>
+            <span className="result-num">#{p.id}{p.id === 1 ? " — Top Pick" : ""}</span>
             <span className="result-badge">Hidden Gem</span>
           </div>
           <p className="result-name">{p.name}</p>
