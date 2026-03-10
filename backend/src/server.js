@@ -1,5 +1,7 @@
 import dotenv from "dotenv";
 import express from "express";
+import cors from "cors"
+
 import { connectDB } from "./config/db.js";
 import notesRoutes from "./routes/notesRoutes.js";
 import paraibaRoutes from "./routes/paraibaRoutes.js";
@@ -11,6 +13,9 @@ const app = express();
 const PORT = process.env.PORT || 5001
 
 connectDB();
+
+// cors
+app.use(cors())
 
 // middleware
 app.use(express.json());

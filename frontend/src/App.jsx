@@ -361,7 +361,7 @@ const css = `
     .home-title { font-size: 28px; }
   }
 `
-
+/* Last update 030926
 const PLACES = {
   restaurants: [
     { id: 1, name: "Satch's Pizza", address: "1800 W University Ave, Gainesville, FL", desc: "A Gainesville staple loved by locals for decades. Incredible brick-oven slices tucked away from tourist trails.", sentiment: "94% positive", mentions: "142 mentions" },
@@ -386,12 +386,14 @@ const PLACES = {
   ],
 }
 
+
 const COMMENTS = [
   { text: "This place is absolutely a hidden gem — been going for 5 years and it never disappoints.", upvotes: 326, source: "r/GNV" },
   { text: "Locals only know about this. Please don't let tourists find out.", upvotes: 218, source: "r/Gainesville" },
   { text: "Stumbled on this by accident and it completely changed my view of GNV.", upvotes: 194, source: "r/GNV" },
   { text: "Way better than anything on the tourist lists. Authentic and affordable.", upvotes: 128, source: "r/Florida" },
 ]
+*/
 
 const ICONS = { restaurants: "🍴", cafes: "☕", attractions: "🌿" }
 
