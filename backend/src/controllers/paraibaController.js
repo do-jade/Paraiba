@@ -50,14 +50,45 @@ export async function createParaibaEntry(req, res) {
 // Jimin
 export async function getParaibaEntries(req, res) {
   try {
-    const { category } = req.query
-    const query = category 
-      ? { category: { $regex: category, $options: 'i' } } 
-      : {}
-    const entries = await Paraiba.find(query).sort({ ranking: -1 }).limit(5)
-    return res.status(200).json(entries)
+    const { category } = req.query;
+    let query = {};
+
+    if (category) {
+      const normalizedCategory = category.toLowerCase();
+
+      if (normalizedCategory === "restaurant") {
+        query = {
+          $or: [
+            { category: { $regex: "restaurant", $options: "i" } },
+            { category: { $regex: "food", $options: "i" } },
+          ],
+        };
+      } else if (normalizedCategory === "attraction") {
+        query = {
+          $and: [
+            {
+              $or: [
+                { category: { $regex: "establishment", $options: "i" } },
+                { category: { $regex: "attraction", $options: "i" } },
+              ],
+            },
+            {
+              category: { $not: /restaurant|food/i },
+            },
+          ],
+        };
+      } else {
+        query = {
+          category: { $regex: category, $options: "i" },
+        };
+      }
+    }
+
+    const entries = await Paraiba.find(query).sort({ ranking: -1 }).limit(5);
+    console.log(entries);
+    return res.status(200).json(entries);
   } catch (error) {
-    console.log("Error in getParaibaEntries controller", error)
-    return res.status(500).json({ message: "Internal server error" })
+    console.log("Error in getParaibaEntries controller", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 }

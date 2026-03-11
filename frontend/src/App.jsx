@@ -30,6 +30,9 @@ export default function App() {
                     : cat === 'cafes' ? 'Cafe'
                     : 'Attraction'
       const res = await axios.get(`/api/paraiba?category=${keyword}`)
+      console.log("API response:", res.data)
+      console.log("First place:", res.data[0])
+      console.log("First place comments:", res.data[0]?.comments)
       setPlaces(res.data)
     } catch (err) {
       console.error('Failed to fetch places:', err)

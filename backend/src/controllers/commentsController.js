@@ -24,7 +24,7 @@ export async function createCommentsUsingRedditScrapper(req, res) {
     const input = {
       ignorestartUrls: false,
       includeNSFW: false,
-      maxItems: 10,
+      maxItems: 20,
       searchComments: true,
       searchCommunities: false,
       searchPosts: false,
@@ -34,33 +34,63 @@ export async function createCommentsUsingRedditScrapper(req, res) {
       skipUserPosts: false,
       sort: "top",
       startUrls: [
-        {
-          url: "https://www.reddit.com/r/GNV/comments/dydpd0/whats_the_most_underrated_restaurant_in_town/",
-        },
-        {
-          url: "https://www.reddit.com/r/GNV/comments/1ixxyzg/best_new_or_hidden_gem_restaurants/",
-        },
-        {
-          url: "https://www.reddit.com/r/GNV/comments/1jog9o7/best_hidden_resturant_gems_of_gainesville/",
-        },
-        {
-          url: "https://www.reddit.com/r/GNV/comments/1ky80ob/hidden_gems_to_go_to_for_a_meal/",
-        },
-        {
-          url: "https://www.reddit.com/r/GNV/comments/bi861b/hidden_food_gems/",
-        },
-        {
-          url: "https://www.reddit.com/r/GNV/comments/ajenmt/anyone_know_any_outdoor_hidden_gems/",
-        },
-        {
-          url: "https://www.reddit.com/r/GNV/comments/171j93p/fun_hidden_gems_in_gnv_that_are_cheapfree/",
-        },
-        {
-          url: "https://www.reddit.com/r/GNV/comments/26zn3r/what_are_some_holeinthewallhidden_restaurant_gems/",
-        },
-        {
-          url: "https://www.reddit.com/r/GNV/comments/7ozzn3/what_are_some_undiscovered_hidden_gem_restaurants/",
-        },
+        // {
+        //   url: "https://www.reddit.com/r/GNV/comments/dydpd0/whats_the_most_underrated_restaurant_in_town/",
+        // },
+        // {
+        //   url: "https://www.reddit.com/r/GNV/comments/1ixxyzg/best_new_or_hidden_gem_restaurants/",
+        // },
+        // {
+        //   url: "https://www.reddit.com/r/GNV/comments/1jog9o7/best_hidden_resturant_gems_of_gainesville/",
+        // },
+        // {
+        //   url: "https://www.reddit.com/r/GNV/comments/1ky80ob/hidden_gems_to_go_to_for_a_meal/",
+        // },
+        // {
+        //   url: "https://www.reddit.com/r/GNV/comments/bi861b/hidden_food_gems/",
+        // },
+        // {
+        //   url: "https://www.reddit.com/r/GNV/comments/ajenmt/anyone_know_any_outdoor_hidden_gems/",
+        // },
+        // {
+        //   url: "https://www.reddit.com/r/GNV/comments/171j93p/fun_hidden_gems_in_gnv_that_are_cheapfree/",
+        // },
+        // {
+        //   url: "https://www.reddit.com/r/GNV/comments/26zn3r/what_are_some_holeinthewallhidden_restaurant_gems/",
+        // },
+        // {
+        //   url: "https://www.reddit.com/r/GNV/comments/7ozzn3/what_are_some_undiscovered_hidden_gem_restaurants/",
+        // },
+        // {
+        //   url: "https://www.reddit.com/r/GNV/comments/14g7yv0/food_bucket_list_for_gnv/"
+        // },
+        // {
+        //   url: "https://www.reddit.com/r/GNV/comments/s3gfeq/unique_restaurants_to_visit/"
+        // },
+        // {
+        //   url: "https://www.reddit.com/r/GNV/comments/st75b7/i_just_got_a_new_job_and_i_want_to_go_somewhere/"
+        // },
+        // {
+        //   url: "https://www.reddit.com/r/GNV/comments/16utspe/nice_restaurants_that_wont_break_the_bank/"
+        // },
+        // {
+        //   url: "https://www.reddit.com/r/GNV/comments/1ax8txp/beautiful_outdoor_space/"
+        // },
+        // {
+        //   url: "https://www.reddit.com/r/GNV/comments/uazmep/best_outdoor_date_ideas/"
+        // },
+        // {
+        //   url: "https://www.reddit.com/r/GNV/comments/1p55ts9/best_nature_spot_to_chill/"
+        // },
+        // {
+        //   url: "https://www.reddit.com/r/GNV/comments/1gagdh2/go_to_restaurants/"
+        // },
+        // {
+        //   url: "https://www.reddit.com/r/GNV/comments/1kpyk74/best_sweet_treat_spot/"
+        // },
+        // {
+        //   url: "https://www.reddit.com/r/GNV/comments/1ble1q8/best_dessert_in_gnv/"
+        // }
       ],
       time: "all",
     };

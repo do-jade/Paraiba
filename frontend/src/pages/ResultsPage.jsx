@@ -26,7 +26,7 @@ export default function ResultsPage({ places, category, label, onSelect, onBack 
           onClick={() => onSelect(p)}
         >
           <div className="result-top-row">
-            <span className="result-num">#{p.ranking}</span>
+            <span className="result-num">Ranking: {p.ranking}</span>
             <span className="result-badge">Hidden Gem</span>
           </div>
           <p className="result-name">{p.name}</p>

@@ -1,11 +1,10 @@
 import BackBtn from '../components/BackBtn'
 
-const ICONS = { restaurants: '🍴', cafes: '☕', attractions: '🌿' }
+const ICONS = { restaurants: '🍴', attractions: '🌿' }
 
 export default function CategoryPage({ onSelect, onBack }) {
   const cats = [
     { key: 'restaurants', label: 'Restaurants' },
-    { key: 'cafes', label: 'Cafes' },
     { key: 'attractions', label: 'Attractions' },
   ]
   return (
