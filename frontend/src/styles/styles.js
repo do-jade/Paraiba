@@ -122,7 +122,7 @@ const css = `
     font-size: 28px; font-weight: 900; color: #1a1a2e;
   }
   .cat-grid {
-    display: grid; grid-template-columns: repeat(3, 1fr);
+    display: grid; grid-template-columns: repeat(2, 1fr);
     gap: 12px; width: 100%;
   }
   .cat-card {
