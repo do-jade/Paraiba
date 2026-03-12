@@ -6,6 +6,7 @@ export async function createParaibaEntry(req, res) {
       name,
       address,
       category,
+      cuisineType,
       reviewCount,
       rating,
       description,
@@ -17,12 +18,23 @@ export async function createParaibaEntry(req, res) {
       comments,
       googleReviews,
       link,
+      servesBreakfast,
+      servesBrunch,
+      servesLunch,
+      servesDinner,
+      servesBeer,
+      servesWine,
+      servesVegetarian,
+      dineIn,
+      takeout,
+      delivery,
     } = req.body;
 
     const entry = new Paraiba({
       name,
       address,
       category,
+      cuisineType,
       reviewCount,
       rating,
       description,
@@ -34,6 +46,16 @@ export async function createParaibaEntry(req, res) {
       comments,
       googleReviews,
       link,
+      servesBreakfast,
+      servesBrunch,
+      servesLunch,
+      servesDinner,
+      servesBeer,
+      servesWine,
+      servesVegetarian,
+      dineIn,
+      takeout,
+      delivery,
     });
     const savedEntry = await entry.save();
 

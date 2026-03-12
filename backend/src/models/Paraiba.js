@@ -17,6 +17,10 @@ const paraibaSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
+    cuisineType: {
+      type: String,
+      required: false,
+    },
     reviewCount: {
       type: Number,
       required: false,
@@ -73,6 +77,46 @@ const paraibaSchema = new mongoose.Schema(
       type: [String],
       required: false,
       default: [],
+    },
+    servesBreakfast: {
+      type: Boolean,
+      required: false,
+    },
+    servesBrunch: {
+      type: Boolean,
+      required: false,
+    },
+    servesLunch: {
+      type: Boolean,
+      required: false,
+    },
+    servesDinner: {
+      type: Boolean,
+      required: false,
+    },
+    servesBeer: {
+      type: Boolean,
+      required: false,
+    },
+    servesWine: {
+      type: Boolean,
+      required: false,
+    },
+    servesVegetarian: {
+      type: Boolean,
+      required: false,
+    },
+    dineIn: {
+      type: Boolean,
+      required: false,
+    },
+    takeout: {
+      type: Boolean,
+      required: false,
+    },
+    delivery: {
+      type: Boolean,
+      required: false,
     },
   },
   { timestamps: true }, //createdAt, updatedAt
