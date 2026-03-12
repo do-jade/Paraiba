@@ -1,0 +1,38 @@
+Reddit Collection Schema: 
+	 
+	comment_text - Stores raw Reddit comments
+	upvotes - Number of upvotes from the associated comment
+	link - Link of the Reddit source
+	processed - Flag to indicate if the data has already been processed through ParaibaModels
+	__v - Created by MongoDB, not used
+	createdAt: Time entry was created
+	updatedAt: Time entry was updated
+
+Paraibas Schema: 
+	
+	name - Name of place from Google  
+	address - Address of place from Google
+	category - Categories found from Google
+	categoryType - Can be multiple actual categories to filter the locations 
+	reviewCount - Number of reviews from Google 
+	rating - #/5 stars found from Google 
+	description - description of the location from Google 
+	sentimentRating - Rating found from Vader Sentiment Analysis (averaged)
+	ranking - Score found from rankingModel.py (averaged)
+	upvotes - Number of upvotes from Reddit Collection (averaged)
+	mentionCount - How many times a location is mentioned throughout the Reddit Collection data (averaged)
+	location - Default is Gainesville, others may be included if expanded
+	comments - Stored list of Reddit comments (can be multiple if mentioned multiple times)
+	googleReviews - List of the top 5 reviews from Google
+	link - List of links for the Reddit comments
+	servesBreakfast - Boolean if the place serves breakfast from Google
+	servesBrunch - Boolean if the place serves brunch from Google
+	servesLunch - Boolean if the place serves lunch from Google
+	servesDinner - Boolean if the place serves dinner from Google
+	servesBeer - Boolean if the place offers beer from Google
+	servesWine - Boolean if the place offers wine from Google
+	servesVegetarian - Boolean if the place offers vegetarian food from Google
+	dineIn - Boolean if the place offers dine in options from Google
+	takeout - Boolean if the place offers takeout options from Google
+	delivery - Boolean if the place offers delivery options from Google
+	
