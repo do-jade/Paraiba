@@ -35,7 +35,7 @@ console.log("length:", place.comments?.length)
               </span>
             </div>
             <div className="meta-item">
-              <span className="meta-label">GoogleReviews</span>
+              <span className="meta-label">Google Reviews</span>
               <span className="meta-value">{place.reviewCount ? `${place.reviewCount} reviews` : "N/A"}</span>
             </div>
             <div className="meta-item">
