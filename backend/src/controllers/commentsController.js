@@ -91,6 +91,22 @@ export async function createCommentsUsingRedditScrapper(req, res) {
         // {
         //   url: "https://www.reddit.com/r/GNV/comments/1ble1q8/best_dessert_in_gnv/"
         // }
+        // {
+        //   url: "https://www.reddit.com/r/GNV/comments/1pmejgt/favorite_local_experienceattraction/"
+        // },
+        // {
+        //   url: "https://www.reddit.com/r/GNV/comments/7r378z/visiting_gainesville_for_a_week_what_should_i_do/"
+        // }
+        // {
+        //   url: "https://www.reddit.com/r/GNV/comments/12xxhug/best_chinese_takeout_that_has_a_good_price_to/"
+        // },
+        // {
+        //   url: "https://www.reddit.com/r/GNV/comments/1dbym7x/i_am_a_lone_traveler_and_im_very_bored_what/"
+        // },
+        // {
+        //   url: "https://www.reddit.com/r/GNV/comments/1etmfsi/ideas_for_fun_things_to_do_in_gainesville_that/"
+        // }
+
       ],
       time: "all",
     };
