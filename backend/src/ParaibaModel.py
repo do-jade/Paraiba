@@ -4,6 +4,7 @@ from pymongo import MongoClient
 from dotenv import load_dotenv
 from vader import analyzer 
 from rankingModel import paraibaScore
+import re
 import os
 
 #reminder that it must run py -3.12 -m pip install ...
@@ -24,10 +25,11 @@ if TEST:
     # Test with hardcoded data
     comments = [
         {
-            '_id': '6993f3b8dedc9dd1aac4e9f2',
-            'comment_text': "A little outside the city but Pearl’s Country Store and BBQ is incredible. It’s attached to a gas station/convenience store but it is unbelievable. Definitely worth the drive and certainly underrated.",
+            '_id': '6993f3b8dedc9dd1aac4e9f7',
+            'comment_text': "A little outside the city but Pearl's. It’s attached to a gas station/convenience store but it is unbelievable. Definitely worth the drive and certainly underrated.",
             'upvotes': 47,
             'link': 'https://www.reddit.com/r/GNV/comments/dydpd0/whats_the_most_underrated_restaurant_in_town/f80i6es',
+            'processed': False
         }
     ]
     print("TEST")
@@ -54,7 +56,7 @@ placeCategories = { #matches on these keywords to check for a category manualy, 
     "korean": ["korean", "kbbq", "korean bbq", "bibimbap", "bulgogi", "tteokbokki"],
     "mexican": ["mexican", "tex-mex", "tacos", "burrito", "enchilada", "tamale", "taqueria"],
     "mediterranean": ["mediterranean", "greek", "turkish", "lebanese", "persian", "falafel", "hummus", "shawarma"],
-    "indian": ["indian", "curry", "tandoori", "biryani", "naan", "dosa", "chai"],
+    "indian": ["indian", "tandoori", "biryani", "naan", "dosa", "chai"],
     "vietnamese": ["vietnamese", "pho", "banh mi", "spring rolls", "bun bo hue"],
     "thai": ["thai", "pad thai", "green curry", "tom yum", "satay"],
     "seafood": ["seafood", "fish", "shrimp", "crab", "lobster", "oyster", "clam", "boil"],
@@ -94,13 +96,34 @@ placeCategories = { #matches on these keywords to check for a category manualy, 
 }
 
 def getCategory(name, description, reviews, googleTypes): #look at name, description, review, and google types to see if it can match a category
-    text = " ".join([name or "", description or "", " ".join(r.get('text', '') for r in reviews)," ".join(googleTypes or [])
-    ]).lower()
+    def wordMatch(keyword, text): #function to match on words using regex, keyword must be a standalone word
+        return bool(re.search(r'\b' + re.escape(keyword) + r'\b', text))
+    
+    def reviewMatchCount(keyword, reviewList): #loops through every review and counts how many individual reviews have the keyword associated with it
+        return sum(1 for r in reviewList if wordMatch(keyword, r.get('text', '').lower())) #helps to cut down on extra categories
+    
+    primaryText = " ".join([name or "", description or "", " ".join(googleTypes or [])]).lower() #combine name, description, and tags to see if a category matches
+    googleTypesLower = [t.lower() for t in (googleTypes or [])]
+    googleTypeMap = { "bar": "bar", "cafe": "cafe", "museum": "museum", "park": "park", "campground": "camping", "gym": "fitness", "stadium": "performing arts", "movie_theater": "performing arts", "bowling_alley": "arcade", "zoo": "wildlife", "aquarium": "wildlife",}
+    found = [] #above is to match on googles categories, does not really help tho
+    for gType, mappedCategory in googleTypeMap.items(): #if it does match then append onto category
+        if gType in googleTypesLower and mappedCategory:
+            found.append(mappedCategory) 
+    outdoorOnlyCategories = {"hiking", "park", "water sports", "swimming", "cycling", "camping", "wildlife", "water body"} #outdoor only to help with distinction between indoor and outdoor
+    reviewThreshold = 1 if len(reviews) <=3 else 2 #if the number of reviews is less than 3 then one review can count for category, otherwise 2 reviews must share same keyword
 
-    found = [] #add any keywords
-    for category, keywords in placeCategories.items(): #look within keywordsd
-        if any(keyword in text for keyword in keywords):  # if any keyword for this category matches
-            found.append(category) #get the category 
+    for category, keywords in placeCategories.items(): #run through every category and match based on confidence
+        if category in found: #if already part of category stkip
+            continue
+        if any(wordMatch(kw, primaryText) for kw in keywords):
+            found.append(category) #if the name, description, and type match append the category
+            continue
+        if category in outdoorOnlyCategories: #dont check reviews for these as people can put in random keywords that will hit, dont want a trail to include a bar bc someone drank a beer on it
+            continue
+        reviewVotes = sum( 1 for kw in keywords if reviewMatchCount(kw, reviews) >= reviewThreshold)
+        if reviewVotes >= 1: #counts how many keywords appear and if they have a good reviewcount then add the category in
+            found.append(category) #this helps from a random trail having 12 categories including restuarants
+    found = list(dict.fromkeys(found)) #deduplicate the list to make sure the same category does not appear more than once
 
     outdoorCategories = {"hiking", "park", "water sports", "swimming", "cycling", "camping", "wildlife", "water body"} #categories from above that match outdoors
     indoorCategories = {"museum", "performing arts", "arcade", "fitness", "bakery", "cafe", "brewery", "winery", "bar"} #categories from above that match indoors
@@ -109,12 +132,12 @@ def getCategory(name, description, reviews, googleTypes): #look at name, descrip
     indoorKeywords = ["inside", "indoor", "air conditioned", "air-conditioned", "cozy", "intimate"] #additional indoor keywords that may represent it better
 
     isOutdoor = (
-        any(cat in found for cat in outdoorCategories) or #if any categories are in outdoor categories
-        any(keyword in text for keyword in outdoorKeywords) #or any words for outdoors are in then mark as outdoor
+        any(cat in found for cat in outdoorCategories) or
+        any(wordMatch(kw, primaryText) for kw in outdoorKeywords)
     )
     isIndoor = (
-        any(cat in found for cat in indoorCategories) or #if any categories are in indoor categories
-        any(keyword in text for keyword in indoorKeywords) #or any words for indoors are in then mark as indoor
+        any(cat in found for cat in indoorCategories) or
+        any(wordMatch(kw, primaryText) for kw in indoorKeywords)
     )
 
     if isOutdoor and isIndoor:
@@ -136,7 +159,7 @@ def matchLocs(spaCy, existing): #this is a helper function to match spacy names 
     for gName, details in existing.items(): #check for substring match
         dWords = set(gName.replace("'s", "").replace("'s", "").split()) #do the same apostrophe checking 
         overlap = len(spacy_words & dWords) #get the word length together
-        if overlap >=2: #if more than two words match
+        if overlap >=1: #if at least one word matches
             return(gName, details) #return it
     
     return (None, None) #cannot find it
@@ -211,7 +234,8 @@ if newLocations:  # if the name is new to the pariabas collection
                 
 
                 overlap = len(spacy_words & google_words)
-                if overlap >= 2: #if at least 2 words match
+                iFpossessive = loc['name'].endswith("'s") or loc['name'].endswith("\u2019s")
+                if (iFpossessive and overlap >= 1) or overlap >= 2: #if at least 2 words match or is a possesive name
                     matching = loc
                     print("went for the overlap")
                     break
@@ -230,7 +254,7 @@ if newLocations:  # if the name is new to the pariabas collection
             )
 
             categoryType = getCategory(
-                gLoc['name'], gLoc.get('description'), gLoc.get('googlereviews', []) #run get cuisine to get the cuisine, if it does not find one it is general
+                gLoc['name'], gLoc.get('description'), gLoc.get('googlereviews', []), gLoc.get('category', []) #run get cuisine to get the cuisine, if it does not find one it is general
             )
  
             paraibaCollection.update_one( #Changed from Insert to update to ensure duplicates are handled

@@ -79,8 +79,8 @@ class GooglePlacesValidator:
                               
             detailsParams = {
                 'place_id': placeID,
-                'fields': 'name,formatted_address,rating,user_ratings_total,types,editorial_summary,reviews, '
-                'serves_beer,serves_breakfast,serves_brunch,serves_dinner,serves_lunch, ' #add in more descriptors
+                'fields': 'name,formatted_address,rating,user_ratings_total,types,editorial_summary,reviews,'
+                'serves_beer,serves_breakfast,serves_brunch,serves_dinner,serves_lunch,' #add in more descriptors
                 'serves_vegetarian_food,serves_wine,dine_in,takeout,delivery', #get the name, address, rating, total reviews, category, 
                 #description, and top 5 reviews
                 'key': self.api_key
@@ -90,6 +90,11 @@ class GooglePlacesValidator:
             finalResponse = requests.get(self.details_url, params=detailsParams) #call the api again to get all the details required
             finalData = finalResponse.json() #write it as json
 
+            # DEBUG: print the raw details response to diagnose API key / billing issues
+            print(f"Details API status: {finalData.get('status')}")
+            if finalData.get('status') != 'OK':
+                print(f"Details API error: {finalData.get('error_message', 'no error_message returned')}")
+
             #below is to ensure the places match
             place = finalData.get('result', {}) #get the name from final result
             place_name = place.get('name', '') #get the name from original text
@@ -98,11 +103,17 @@ class GooglePlacesValidator:
             entity_words = set(entity_lower.replace("'s", "").split()) #just incase there are apostrophes
             place_words = set(place_lower.replace("'s", "").split())
             overlap = len(entity_words & place_words) #get how many characters match each other
-            match_ratio = overlap / len(entity_words) if entity_words else 0 #if the overlap is less than 50% of the words
 
-            if match_ratio < 0.5: #if less than 0 dont return
+            # Check both directions: entity words in place name AND place words in entity name.
+            # Use the higher ratio so that "Pearl's Country Store" still matches
+            # "Pearl's Country Store and BBQ" (and vice versa for shortened Google names).
+            forward_ratio  = overlap / len(entity_words) if entity_words else 0
+            backward_ratio = overlap / len(place_words)  if place_words  else 0
+            match_ratio    = max(forward_ratio, backward_ratio)
 
-                print(f"google and spacy does not match")
+            if match_ratio < 0.5:
+
+                print(f"google and spacy does not match: '{entity}' vs '{place_name}' (ratio={match_ratio:.2f})")
 
                 return None
 
