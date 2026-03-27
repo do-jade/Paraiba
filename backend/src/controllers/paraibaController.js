@@ -72,9 +72,19 @@ export async function createParaibaEntry(req, res) {
 // Jimin
 export async function getParaibaEntries(req, res) {
   try {
-    const { category } = req.query;
+    const { category, categoryType, limit } = req.query;
+
+    // Parse limit (default 5)
+    const resultLimit = parseInt(limit) || 5;
+
+    // Parse comma-separated categoryType filters
+    const typeFilters = categoryType
+      ? categoryType.split(",").map(t => t.trim()).filter(Boolean)
+      : [];
+
     let query = {};
 
+    // Build category query
     if (category) {
       const normalizedCategory = category.toLowerCase();
 
@@ -106,8 +116,22 @@ export async function getParaibaEntries(req, res) {
       }
     }
 
-    const entries = await Paraiba.find(query).sort({ ranking: -1 }).limit(5);
-    console.log(entries);
+    // Apply categoryType filters — each selected filter must appear in the categoryType string
+    if (typeFilters.length > 0) {
+      const typeConditions = typeFilters.map(filter => ({
+        categoryType: { $regex: filter, $options: "i" },
+      }));
+
+      // AND logic: place must match ALL selected filters
+      if (query.$and) {
+        query.$and.push(...typeConditions);
+      } else {
+        query.$and = typeConditions;
+      }
+    }
+
+    const entries = await Paraiba.find(query).sort({ ranking: -1 }).limit(resultLimit);
+    console.log(`Returning ${entries.length} entries (limit: ${resultLimit}, filters: ${typeFilters.join(", ") || "none"})`);
     return res.status(200).json(entries);
   } catch (error) {
     console.log("Error in getParaibaEntries controller", error);

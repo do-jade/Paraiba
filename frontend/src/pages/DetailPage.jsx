@@ -2,6 +2,16 @@ import BackBtn from "../components/BackBtn";
 import PlaceMap from "../components/PlaceMap";
 
 export default function DetailPage({ place, label, onBack }) {
+  const truncateText = (text, maxLength = 140) => {
+    const normalized = String(text).trim();
+
+    if (normalized.length <= maxLength) {
+      return normalized;
+    }
+
+    return `${normalized.slice(0, maxLength).trimEnd()}...`;
+  };
+
   const rawTypes = Array.isArray(place.categoryType)
     ? place.categoryType
     : typeof place.categoryType === "string"
@@ -14,114 +24,125 @@ export default function DetailPage({ place, label, onBack }) {
     .filter((type) => type.toLowerCase() !== "general")
     .slice(0, 4)
     .map((type) =>
-      type
-        .split(" ")
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(" "),
+      type.split(" ").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")
     );
 
   const sentimentValue = place.sentimentRating ?? place.sentimentrating;
-  const description =
+  const rawDescription =
     place.description ||
-    (place.comments && place.comments.length > 0 ? `"${place.comments[0].text}"` : "No description yet.");
+    (place.comments && place.comments.length > 0
+      ? `"${place.comments[0].text}"`
+      : "No description yet.");
+  const description = truncateText(rawDescription);
+
+  const gemScore = place.ranking ? Math.round(place.ranking) : null;
+  const sentimentPct = sentimentValue ? Math.round(sentimentValue * 100) : null;
 
   return (
     <>
       <BackBtn onClick={onBack} />
-      <p className="detail-breadcrumb fu">
-        {label} / {place.name}
-      </p>
-      <div className="detail-card detail-hero fu1">
-        <div className="detail-body">
-          <div className="detail-intro">
-            <p className="detail-cat">{label}</p>
-            <h2 className="detail-name">{place.name}</h2>
-            <p className="detail-desc">{description}</p>
-            {displayTypes.length > 0 && (
-              <div className="detail-tag-row">
-                {displayTypes.map((type) => (
-                  <span key={type} className="detail-tag">
-                    {type}
-                  </span>
-                ))}
-              </div>
-            )}
-          </div>
-          <div className="detail-meta-grid">
-            <div className="meta-item highlight">
-              <span className="meta-label with-info">
-                Gem Score
-                <span className="info-trigger" tabIndex="0" aria-label="How Gem Score is calculated">
-                  i
-                  <span className="info-tooltip">
-                    Calculated from Reddit engagement, sentiment analysis, and Google place quality signals.
-                  </span>
-                </span>
-              </span>
-              <span className="meta-value large">
-                {place.ranking ? `${Math.round(place.ranking)} / 100` : "N/A"}
-              </span>
+
+      {/* ── HERO: name + description left, Gem Score callout right ── */}
+      <div className="detail-hero fu">
+        <div className="detail-hero-left">
+          <p className="detail-cat fu1">{label}</p>
+          <h2 className="detail-name fu2">{place.name}</h2>
+          {displayTypes.length > 0 && (
+            <div className="detail-tag-row fu3">
+              {displayTypes.map((type) => (
+                <span key={type} className="detail-tag">{type}</span>
+              ))}
             </div>
-            <div className="meta-item">
-              <span className="meta-label">Sentiment</span>
-              <span className="meta-value">
-                {sentimentValue ? `${Math.round(sentimentValue * 100)}% positive` : "N/A"}
-              </span>
-            </div>
-            <div className="meta-item">
-              <span className="meta-label">Reddit Mentions</span>
-              <span className="meta-value">
-                {place.mentionCount ? `${place.mentionCount} mentions` : "N/A"}
-              </span>
-            </div>
-            <div className="meta-item">
-              <span className="meta-label">Address</span>
-              <span className="meta-value small">{place.address || "Gainesville, FL"}</span>
-            </div>
-            <div className="meta-item">
-              <span className="meta-label">Google Reviews</span>
-              <span className="meta-value">
-                {place.reviewCount ? `${place.reviewCount} reviews` : "N/A"}
-              </span>
-            </div>
-            <div className="meta-item">
-              <span className="meta-label">Google Rating</span>
-              <span className="meta-value">
-                {place.rating ? `${place.rating.toFixed(1)} / 5` : "N/A"}
-              </span>
-            </div>
-          </div>
+          )}
+          <p className="detail-desc fu4">{description}</p>
         </div>
+
+        {/* Gem Score — primary metric, visually dominant */}
+        <div className="detail-score-callout fu3">
+          <span className="detail-score-label">
+            Gem Score
+            <span className="info-trigger" tabIndex="0" aria-label="How Gem Score is calculated">
+              i
+              <span className="info-tooltip">
+                Calculated from Reddit engagement, sentiment analysis, and Google place quality signals.
+              </span>
+            </span>
+          </span>
+          <span className="detail-score-number">{gemScore ?? "—"}</span>
+          <span className="detail-score-sub">out of 100</span>
+        </div>
+      </div>
+
+      {/* ── STATS STRIP: secondary metrics chunked into one scannable row ── */}
+      <div className="detail-stats-strip fu4">
+        <div className="detail-stat">
+          <span className="detail-stat-value">
+            {sentimentPct != null ? `${sentimentPct}%` : "—"}
+          </span>
+          <span className="detail-stat-label">Positive Sentiment</span>
+        </div>
+        <div className="detail-stat-divider" />
+        <div className="detail-stat">
+          <span className="detail-stat-value">{place.mentionCount ?? "—"}</span>
+          <span className="detail-stat-label">Reddit Mentions</span>
+        </div>
+        <div className="detail-stat-divider" />
+        <div className="detail-stat">
+          <span className="detail-stat-value">
+            {place.rating ? `${place.rating.toFixed(1)} ★` : "—"}
+          </span>
+          <span className="detail-stat-label">Google Rating</span>
+        </div>
+        <div className="detail-stat-divider" />
+        <div className="detail-stat">
+          <span className="detail-stat-value">{place.reviewCount ?? "—"}</span>
+          <span className="detail-stat-label">Google Reviews</span>
+        </div>
+        <div className="detail-stat-divider" />
+        <div className="detail-stat detail-stat-address">
+          <span className="detail-stat-value detail-stat-address-val">
+            {place.address || "Gainesville, FL"}
+          </span>
+          <span className="detail-stat-label">Address</span>
+        </div>
+      </div>
+
+      {/* ── MAP ── */}
+      <div className="detail-map-section fu5">
         <PlaceMap place={place} />
       </div>
-      <div className="detail-section-header fu2">
-        <p className="comments-heading">What locals are saying on reddit</p>
-        {place.link && place.link.length > 0 && (
-          <a
-            href={place.link[0]}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="detail-link-btn"
-          >
-            ↗ View on Reddit
-          </a>
+
+      {/* ── COMMENTS ── */}
+      <div className="detail-comments-section">
+        <div className="detail-section-header fu">
+          <p className="comments-heading">What locals are saying on Reddit</p>
+          {place.link && place.link.length > 0 && (
+            <a
+              href={place.link[0]}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="detail-link-btn"
+            >
+              ↗ View on Reddit
+            </a>
+          )}
+        </div>
+        {place.comments && place.comments.length > 0 ? (
+          <div className="comments-list">
+            {place.comments.map((c, i) => (
+              <div key={i} className={`comment-card fu${Math.min(i + 2, 5)}`}>
+                <div className="comment-quote-mark">"</div>
+                <div className="comment-body">
+                  <span className="comment-text">{c.text}</span>
+                  <span className="comment-source">Local Reddit mention • r/GNV</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="detail-empty">No comments yet</p>
         )}
       </div>
-      {place.comments && place.comments.length > 0 ? (
-        <div className="comments-list">
-          {place.comments.map((c, i) => (
-            <div key={i} className={`comment-card fu${Math.min(i + 2, 5)}`}>
-              <div className="comment-quote-mark">“</div>
-              <div className="comment-body">
-                <span className="comment-text">{c.text}</span>
-                <span className="comment-source">Local Reddit mention • r/GNV</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <p className="detail-empty">No comments yet</p>
-      )}
     </>
   );
 }
