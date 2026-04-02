@@ -85,6 +85,7 @@ export default function ResultsPage({ places, category, label, onSelect, onBack,
   const [selectedTypes, setSelectedTypes] = useState([])
   const [count, setCount] = useState(5)
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const safePlaces = Array.isArray(places) ? places : []
 
   const groups = category === 'restaurants' ? RESTAURANT_GROUPS : ATTRACTION_GROUPS
 
@@ -226,7 +227,7 @@ export default function ResultsPage({ places, category, label, onSelect, onBack,
         <div className="results-sidebar-wrap">{sidebar}</div>
 
         <div className="results-main">
-          {places.length === 0 ? (
+          {safePlaces.length === 0 ? (
             <div className="error-state" style={{ marginTop: '40px' }}>
               <span className="error-icon">🔍</span>
               <p className="error-title">No results found</p>
@@ -234,7 +235,7 @@ export default function ResultsPage({ places, category, label, onSelect, onBack,
               <button className="error-btn" onClick={clearAll}>Clear Filters</button>
             </div>
           ) : (
-            places.map((p, i) => (
+            safePlaces.map((p, i) => (
               <div
                 key={p._id}
                 className={`result-card fu${Math.min(i + 1, 5)}${i === 0 ? ' top' : ''}`}

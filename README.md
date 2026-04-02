@@ -40,20 +40,52 @@ A restaurant scores well on Paraíba when it has:
 ---
 
 ### Backend Setup
- 
+
 ```bash
 # Clone the repo
 git clone https://github.com/do-jade/Paraiba.git
 cd Paraiba
 
-# Install Python dependencies
-pip install .
-python -m spacy download en_core_web_sm
+# Install backend dependencies
+cd backend
+npm install
+cp .env.example .env
 ```
+
+Backend environment variables:
+
+- `MONGO_URI`
+- `APIFY_TOKEN`
+- `ALLOWED_ORIGINS`
+
+Run locally:
+
+```bash
+npm run dev
+```
+
 ### Frontend Setup
  
 ```bash
 cd frontend
+cp .env.example .env
 npm install
-npm start
+npm run dev
 ```
+
+Frontend environment variables:
+
+- `VITE_DEV_API_URL`
+- `VITE_API_URL`
+
+### Vercel Deployment
+
+Deploy `frontend` and `backend` as separate Vercel projects.
+
+- Frontend project root: `frontend`
+- Backend project root: `backend`
+
+Set these Vercel environment variables:
+
+- Frontend: `VITE_API_URL=https://<your-backend-domain>`
+- Backend: `MONGO_URI`, `APIFY_TOKEN`, `ALLOWED_ORIGINS=https://<your-frontend-domain>`

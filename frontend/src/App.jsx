@@ -8,6 +8,9 @@ import LoadingPage from './pages/LoadingPage'
 import ResultsPage from './pages/ResultsPage'
 import DetailPage from './pages/DetailPage'
 
+const API_BASE_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '')
+const normalizePlaces = (payload) => (Array.isArray(payload) ? payload : [])
+
 export default function App() {
   const [places, setPlaces] = useState([])
   const [screen, setScreen] = useState('home')
@@ -29,8 +32,12 @@ export default function App() {
       const keyword = cat === 'restaurants' ? 'Restaurant'
                     : cat === 'cafes' ? 'Cafe'
                     : 'Attraction'
-      const res = await axios.get(`/api/paraiba?category=${keyword}&limit=5`)
-      setPlaces(res.data)
+      const res = await axios.get(`${API_BASE_URL}/api/paraiba?category=${keyword}&limit=5`)
+      const nextPlaces = normalizePlaces(res.data)
+      if (!Array.isArray(res.data)) {
+        console.error('Expected array response for places, received:', res.data)
+      }
+      setPlaces(nextPlaces)
     } catch (err) {
       console.error('Failed to fetch places:', err)
       setPlaces([])
@@ -47,8 +54,12 @@ export default function App() {
                     : 'Attraction'
       const params = new URLSearchParams({ category: keyword, limit: count })
       if (filters.length > 0) params.append('categoryType', filters.join(','))
-      const res = await axios.get(`/api/paraiba?${params.toString()}`)
-      setPlaces(res.data)
+      const res = await axios.get(`${API_BASE_URL}/api/paraiba?${params.toString()}`)
+      const nextPlaces = normalizePlaces(res.data)
+      if (!Array.isArray(res.data)) {
+        console.error('Expected array response for places, received:', res.data)
+      }
+      setPlaces(nextPlaces)
     } catch (err) {
       console.error('Failed to fetch places:', err)
       setPlaces([])
