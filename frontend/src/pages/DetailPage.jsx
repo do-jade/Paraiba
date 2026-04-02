@@ -57,7 +57,7 @@ export default function DetailPage({ place, label, onBack }) {
           <p className="detail-desc fu4">{description}</p>
         </div>
 
-        {/* Gem Score — primary metric, visually dominant */}
+        {/* Gem Score — primary metric, visually dominant out of 70*/}
         <div className="detail-score-callout fu3">
           <span className="detail-score-label">
             Gem Score
@@ -69,7 +69,7 @@ export default function DetailPage({ place, label, onBack }) {
             </span>
           </span>
           <span className="detail-score-number">{gemScore ?? "—"}</span>
-          <span className="detail-score-sub">out of 100</span>
+          <span className="detail-score-sub">out of 75</span>
         </div>
       </div>
 
