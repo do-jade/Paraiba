@@ -6,15 +6,17 @@ Getting Started
 
 Prerequisites
 - Node.js v18+
-- Backend server running on port 5001
+- Backend API URL configured in environment variables
 
 Install & Run
 ```bash
+cp .env.example .env
 npm install
 npm run dev
 ```
 
-App runs on `http://localhost:5173`
+Set `VITE_DEV_API_URL` in `.env` for local proxying.
+Set `VITE_API_URL` when the frontend should call a separately deployed backend.
 
 Stack
 
@@ -34,4 +36,9 @@ Screens
 
 API Connection
 
-The app proxies all `/api` requests to `http://localhost:5001` via Vite's dev proxy. Make sure the backend is running before starting the frontend.
+The app reads its API base URL from environment variables:
+
+- `VITE_DEV_API_URL` for the Vite dev proxy
+- `VITE_API_URL` for deployed environments
+
+If `VITE_API_URL` is blank, the frontend will use same-origin `/api` requests.

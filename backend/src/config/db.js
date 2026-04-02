@@ -1,12 +1,31 @@
 import mongoose from "mongoose";
 
+let cachedConnection = null;
+let cachedPromise = null;
+
 export const connectDB = async () => {
+    if (cachedConnection) {
+        return cachedConnection;
+    }
+
+    if (!process.env.MONGO_URI) {
+        throw new Error("Missing MONGO_URI in environment");
+    }
+
+    if (!cachedPromise) {
+        cachedPromise = mongoose.connect(process.env.MONGO_URI).then((connection) => {
+            console.log("MONGODB Connected Successfully");
+            cachedConnection = connection;
+            return connection;
+        });
+    }
+
     try {
-        await mongoose.connect(process.env.MONGO_URI);
-        console.log("MONGODB Connected Successfully");
+        return await cachedPromise;
     }
     catch (error) {
+        cachedPromise = null;
         console.error("Error connecting to MONGODB", error);
-        process.exit(1) // 1 means exit with failure
+        throw error;
     }
-}
+};
