@@ -6,6 +6,9 @@ Senior Capstone Project for the University of Florida
  
 ---
 
+## Paraiba Website
+https://paraiba-nmgr.vercel.app/
+
 ## Overview
  
 Project Paraíba surfaces lesser-known but highly-rated dining spots that get overlooked by mainstream review platforms. Rather than relying solely on star ratings, Paraíba combines Reddit community signals, ML/NLP sentiment analysis, and Google Maps data to compute a composite "Paraíba Score" for each restaurant. Our project rewards places that locals genuinely love but haven't yet been flooded with reviews.
