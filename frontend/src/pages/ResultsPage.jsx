@@ -79,18 +79,19 @@ const ATTRACTION_GROUPS = [
   
 ]
 
-const COUNTS = [5, 10, 15, 20]
+const PAGE_SIZE = 10
 
 export default function ResultsPage({ places, category, label, onSelect, onBack, onRefilter }) {
   const [selectedTypes, setSelectedTypes] = useState([])
-  const [count, setCount] = useState(5)
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const safePlaces = Array.isArray(places) ? places : []
 
   const groups = category === 'restaurants' ? RESTAURANT_GROUPS : ATTRACTION_GROUPS
 
-  const applyFilters = (newTypes, newCount) => {
-    onRefilter(category, newTypes, newCount)
+  const applyFilters = (newTypes) => {
+    setVisibleCount(PAGE_SIZE)
+    onRefilter(category, newTypes)
   }
 
   const handleToggle = (key) => {
@@ -98,19 +99,16 @@ export default function ResultsPage({ places, category, label, onSelect, onBack,
       ? selectedTypes.filter(k => k !== key)
       : [...selectedTypes, key]
     setSelectedTypes(next)
-    applyFilters(next, count)
-  }
-
-  const handleCount = (e) => {
-    const n = parseInt(e.target.value)
-    setCount(n)
-    applyFilters(selectedTypes, n)
+    applyFilters(next)
   }
 
   const clearAll = () => {
     setSelectedTypes([])
-    applyFilters([], count)
+    applyFilters([])
   }
+
+  const visiblePlaces = safePlaces.slice(0, visibleCount)
+  const hasMore = visibleCount < safePlaces.length
 
   const getPrimaryType = (place) => {
     const rawTypes = Array.isArray(place.categoryType)
@@ -155,19 +153,6 @@ export default function ResultsPage({ places, category, label, onSelect, onBack,
 
   const sidebar = (
     <aside className="results-sidebar">
-      {/* Result count dropdown */}
-      <div className="sidebar-section">
-        <p className="sidebar-section-label">Results to show</p>
-        <div className="sidebar-select-wrap">
-          <select className="sidebar-select" value={count} onChange={handleCount}>
-            {COUNTS.map(n => (
-              <option key={n} value={n}>{n} results</option>
-            ))}
-          </select>
-          <span className="sidebar-select-arrow">▾</span>
-        </div>
-      </div>
-
       {/* Grouped category filters */}
       <div className="sidebar-section">
         <div className="sidebar-section-header">
@@ -235,7 +220,7 @@ export default function ResultsPage({ places, category, label, onSelect, onBack,
               <button className="error-btn" onClick={clearAll}>Clear Filters</button>
             </div>
           ) : (
-            safePlaces.map((p, i) => (
+            visiblePlaces.map((p, i) => (
               <div
                 key={p._id}
                 className={`result-card fu${Math.min(i + 1, 5)}${i === 0 ? ' top' : ''}`}
@@ -270,6 +255,17 @@ export default function ResultsPage({ places, category, label, onSelect, onBack,
                 <span className="result-cta">View details →</span>
               </div>
             ))
+          )}
+          {hasMore && (
+            <button
+              className="load-more-btn"
+              onClick={() => setVisibleCount(c => c + PAGE_SIZE)}
+            >
+              Show more results
+              <span className="load-more-count">
+                {safePlaces.length - visibleCount} remaining
+              </span>
+            </button>
           )}
         </div>
       </div>

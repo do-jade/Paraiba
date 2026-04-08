@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import axios from 'axios'
 import css from './styles/styles'
 import Nav from './components/Nav'
@@ -19,6 +19,10 @@ export default function App() {
   const [loadStep, setLoadStep] = useState(0)
   const [place, setPlace] = useState(null)
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+  }, [screen])
+
   const goHome = () => { setScreen('home'); setLoadStep(0) }
 
   const handleCategory = async (cat, lbl) => {
@@ -32,7 +36,7 @@ export default function App() {
       const keyword = cat === 'restaurants' ? 'Restaurant'
                     : cat === 'cafes' ? 'Cafe'
                     : 'Attraction'
-      const res = await axios.get(`${API_BASE_URL}/api/paraiba?category=${keyword}&limit=5`)
+      const res = await axios.get(`${API_BASE_URL}/api/paraiba?category=${keyword}&limit=50`)
       const nextPlaces = normalizePlaces(res.data)
       if (!Array.isArray(res.data)) {
         console.error('Expected array response for places, received:', res.data)
@@ -46,13 +50,13 @@ export default function App() {
     setTimeout(() => setScreen('results'), 2600)
   }
 
-  // Called by ResultsPage when user changes filters or count
-  const handleRefilter = async (cat, filters, count) => {
+  // Called by ResultsPage when user changes filters
+  const handleRefilter = async (cat, filters) => {
     try {
       const keyword = cat === 'restaurants' ? 'Restaurant'
                     : cat === 'cafes' ? 'Cafe'
                     : 'Attraction'
-      const params = new URLSearchParams({ category: keyword, limit: count })
+      const params = new URLSearchParams({ category: keyword, limit: 50 })
       if (filters.length > 0) params.append('categoryType', filters.join(','))
       const res = await axios.get(`${API_BASE_URL}/api/paraiba?${params.toString()}`)
       const nextPlaces = normalizePlaces(res.data)
