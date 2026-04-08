@@ -28,6 +28,17 @@ export default function DetailPage({ place, label, onBack }) {
     );
 
   const sentimentValue = place.sentimentRating ?? place.sentimentrating;
+  const googleReviews = Array.isArray(place.googleReviews)
+    ? place.googleReviews
+        .map((review) => {
+          if (typeof review === "string") return review.trim();
+          if (review && typeof review === "object" && typeof review.text === "string") {
+            return review.text.trim();
+          }
+          return "";
+        })
+        .filter(Boolean)
+    : [];
   const rawDescription =
     place.description ||
     (place.comments && place.comments.length > 0
@@ -112,7 +123,7 @@ export default function DetailPage({ place, label, onBack }) {
       </div>
       <div className="detail-section-rule" aria-hidden="true" />
 
-      {/* ── COMMENTS ── */}
+      {/* ── REDDIT COMMENTS ── */}
       <div className="detail-comments-section">
         <div className="detail-section-header fu">
           <p className="comments-heading">What locals are saying on Reddit</p>
@@ -143,6 +154,38 @@ export default function DetailPage({ place, label, onBack }) {
           <p className="detail-empty">No comments yet</p>
         )}
       </div>
+
+      {/* ── GOOGLE REVIEWS ── */}
+      {googleReviews.length > 0 && (
+        <>
+          <div className="detail-section-rule" aria-hidden="true" />
+          <div className="detail-comments-section">
+            <div className="detail-section-header fu">
+              <p className="comments-heading">Google Reviews</p>
+              <div className="google-rating-badge">
+                <span className="google-rating-star">★</span>
+                <span className="google-rating-value">
+                  {place.rating ? place.rating.toFixed(1) : '—'}
+                </span>
+                {place.reviewCount && (
+                  <span className="google-rating-count">({place.reviewCount.toLocaleString()})</span>
+                )}
+              </div>
+            </div>
+            <div className="comments-list">
+              {googleReviews.map((review, i) => (
+                <div key={i} className={`comment-card fu${Math.min(i + 2, 5)}`}>
+                  <div className="google-g-badge">G</div>
+                  <div className="comment-body">
+                    <span className="comment-text">{review}</span>
+                    <span className="comment-source">Google Review</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
     </>
   );
 }
