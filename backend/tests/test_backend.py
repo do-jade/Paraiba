@@ -1,5 +1,5 @@
-#dependencies spacy, spacy download en_core_web_lg
-#to run use py -3.12 -m pytest tests/ -v
+#To run tests be in backend folder and run: py -3.12 -m pytest -v
+#These are unit tests
 import pytest
 import re
 from unittest.mock import MagicMock, patch, PropertyMock
